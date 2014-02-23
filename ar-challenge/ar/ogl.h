@@ -4,7 +4,6 @@
 #include <string>
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/opengl_interop.hpp>
-#include <Eigen/Dense>
 #if defined(__APPLE__)
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
@@ -42,8 +41,9 @@ class OGLDraw {
         double near, double far,
         double left, double right,
         double bottom, double top,
-        Eigen::Matrix4d &frustumMatrix);
+        cv::Mat &frustumMatrix);
     void    _buildModelMatrix(const PerFrameAppData &perFrameAppData, cv::Mat &glViewMatrix);
+    /*
     void    _build_opengl_projection_for_intrinsics(
             Eigen::Matrix4d &frustum,
             int *viewport,
@@ -56,7 +56,7 @@ class OGLDraw {
             int img_height,
             double near_clip,
             double far_clip );
-    
+    */
     void _drawTetrahedron(const float axisScale) ;
     
     void _buildViewMatrix(

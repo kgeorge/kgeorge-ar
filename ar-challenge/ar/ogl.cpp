@@ -194,7 +194,7 @@ void OGLDraw::_drawTetrahedron(const float axisScale) {
     }
 
     void OGLDraw::_drawAugmentedFrame() {
-         Eigen::Matrix4d frustumMatrix;
+        cv::Mat frustumMatrix(4, 4, CV_64F, Scalar(0));
          int vp[4];
         OGLDraw *pogl = this;
         //double near =0.1, far =100.0, left =0, right =winSize.width, top=winSize.height, bottom=0;
@@ -235,16 +235,17 @@ void OGLDraw::_drawTetrahedron(const float axisScale) {
         cv::Rodrigues( perFrameAppData->rvec, rotMat );
         
         glMatrixMode(GL_PROJECTION);
-        glLoadMatrixd(&frustumMatrix(0,0));
+        glLoadMatrixd(&frustumMatrix.at<double>(0,0));
         //gluPerspective(45.0, (double)winSize.width / winSize.height, 0.1, 100.0);
         glMatrixMode(GL_MODELVIEW);
         
         glMultMatrixd(&glViewMatrix.at<double>(0,0));
 
         glLoadMatrixd(&glModelMatrix.at<double>(0, 0));        //gluLookAt(0, 0, 3, 0, 0, 0, 0, 1, 0);
-        //_drawTetrahedron(0.5f);
-        _drawCoordAxes(0.5f);
+        _drawTetrahedron(0.5f);
+        //_drawCoordAxes(0.5f);
     }
+#if 0
     /**
  @brief basic function to produce an OpenGL projection matrix and associated viewport parameters
  which match a given set of camera intrinsics. This is currently written for the Eigen linear
@@ -324,13 +325,15 @@ void OGLDraw::_build_opengl_projection_for_intrinsics(
     // camera intrinsic matrix
     frustum = ortho*tproj;
 }
+#endif
     //http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
     void OGLDraw::_buildProjectionMatrix(
         const  PerFrameAppData &perFrameAppData,
         double near, double far,
         double left, double right,
         double bottom, double top,
-        Eigen::Matrix4d &frustumMatrix) {
+        cv::Mat &frustumMatrix) {
+        Mat tempFrustumMatrix(4, 4, CV_64F, Scalar(0));
         double alpha = perFrameAppData.intrinsics.at<double>(0,0);
         double beta = perFrameAppData.intrinsics.at<double>(1,1);
         double x0 = perFrameAppData.intrinsics.at<double>(0,2);
@@ -348,14 +351,14 @@ void OGLDraw::_build_opengl_projection_for_intrinsics(
         double bottom_modified = (near/beta) * bottom - y0;
         double top_modified = (near/beta) * top  - y0;
 
-        frustumMatrix.setZero();
-        frustumMatrix(0,0) = 2.0 * near /( right_modified - left_modified );
-        frustumMatrix(0,2) = (right_modified + left_modified ) / (right_modified - left_modified);
-        frustumMatrix(1,1) = 2.0 * near / (top_modified - bottom_modified);
-        frustumMatrix(1,2) = (top_modified + bottom_modified) / (top_modified - bottom_modified);
-        frustumMatrix(2,2) = -(far + near)/ (far - near);
-        frustumMatrix(2,3) = -2.0 * far * near / (far - near);
-        frustumMatrix(3,2) = -1.0;
+        tempFrustumMatrix.at<double>(0,0) = 2.0 * near /( right_modified - left_modified );
+        tempFrustumMatrix.at<double>(0,2) = (right_modified + left_modified ) / (right_modified - left_modified);
+        tempFrustumMatrix.at<double>(1,1) = 2.0 * near / (top_modified - bottom_modified);
+        tempFrustumMatrix.at<double>(1,2) = (top_modified + bottom_modified) / (top_modified - bottom_modified);
+        tempFrustumMatrix.at<double>(2,2) = -(far + near)/ (far - near);
+        tempFrustumMatrix.at<double>(2,3) = -2.0 * far * near / (far - near);
+        tempFrustumMatrix.at<double>(3,2) = -1.0;
+        cv::transpose(tempFrustumMatrix, frustumMatrix);
     }
 
       void OGLDraw::_buildModelMatrix(const PerFrameAppData &perFrameAppData, cv::Mat &glModelMatrix)

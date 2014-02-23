@@ -1,8 +1,5 @@
 INCLUDES = $(shell /usr/local/bin/pkg-config --cflags opencv)
-INCLUDES-EIGEN=$(shell /usr/local/bin/pkg-config --cflags opencv)
 OPENCV-LIBS-DIR = $(shell /usr/local/bin/pkg-config --libs opencv | dirname `awk '{ print $$1 }'`)
-EIGEN-LIBS = $(shell /usr/local/bin/pkg-config --libs eigen3)
-EIGEN-INCLUDES=$(shell /usr/local/bin/pkg-config --cflags eigen3)
 LIBS=\
     $(OPENCV-LIBS-DIR)/libopencv_calib3d.dylib \
     $(OPENCV-LIBS-DIR)/libopencv_contrib.dylib \
@@ -31,8 +28,8 @@ LIBS=\
     
 
 CXX=clang++
-CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL -D USE_GLUT  $(INCLUDES) $(EIGEN-INCLUDES)
-LDFLAGS=$(LIBS) $(EIGEN-LIBS)
+CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL -D USE_GLUT  $(INCLUDES)
+LDFLAGS=$(LIBS)
 #LDFLAGS=
 
 OBJS=ar.o ogl.o findPattern.o
