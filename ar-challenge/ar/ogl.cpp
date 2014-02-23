@@ -68,10 +68,10 @@ void OGLDraw::_drawTetrahedron(const float axisScale) {
     const double as = axisScale * sin(30*M_PI/180.0);
     const double height = axisScale *sqrt(2.0/3.0);
     
-    double A[] = {0,0,axisScale};
-    double B[] = {ac, 0, -as};
-    double C[] = {-ac, 0, -as};
-    double  D[] = {0,height,0};
+    double A[] = {0,axisScale,0};
+    double B[] = {ac, as, 0};
+    double C[] = {-ac, -as, 0};
+    double  D[] = {0,0, -height};
     
     glLineWidth(4);
     glBegin(GL_LINES);
@@ -211,7 +211,7 @@ void OGLDraw::_drawTetrahedron(const float axisScale) {
             left, right,
             bottom, top,
             frustumMatrix);
-         
+        
         
         /*
         _build_opengl_projection_for_intrinsics(
@@ -238,10 +238,12 @@ void OGLDraw::_drawTetrahedron(const float axisScale) {
         glLoadMatrixd(&frustumMatrix(0,0));
         //gluPerspective(45.0, (double)winSize.width / winSize.height, 0.1, 100.0);
         glMatrixMode(GL_MODELVIEW);
-        glLoadMatrixd(&glModelMatrix.at<double>(0, 0));
+        
         glMultMatrixd(&glViewMatrix.at<double>(0,0));
-        //gluLookAt(0, 0, 3, 0, 0, 0, 0, 1, 0);
-        _drawTetrahedron(0.5f);
+
+        glLoadMatrixd(&glModelMatrix.at<double>(0, 0));        //gluLookAt(0, 0, 3, 0, 0, 0, 0, 1, 0);
+        //_drawTetrahedron(0.5f);
+        _drawCoordAxes(0.5f);
     }
     /**
  @brief basic function to produce an OpenGL projection matrix and associated viewport parameters
@@ -358,7 +360,6 @@ void OGLDraw::_build_opengl_projection_for_intrinsics(
 
       void OGLDraw::_buildModelMatrix(const PerFrameAppData &perFrameAppData, cv::Mat &glModelMatrix)
         {
-            //make copies
             cv::Mat rvec(perFrameAppData.rvec);
             cv::Mat tvec(perFrameAppData.tvec);
             cv::Mat rotation(3, 3, CV_64F, Scalar(0)), tempModelMatrix(4, 4, CV_64F, Scalar(0)), cvToOgl(4, 4, CV_64F, Scalar(0));
