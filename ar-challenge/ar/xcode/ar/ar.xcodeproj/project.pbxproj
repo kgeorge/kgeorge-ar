@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		C136517618B45B2A0051DB07 /* findPattern.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = findPattern.cpp; path = ../../findPattern.cpp; sourceTree = "<group>"; };
+		C136517718B45B2A0051DB07 /* findPattern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = findPattern.h; path = ../../findPattern.h; sourceTree = "<group>"; };
 		C1B9A56018B051F0005F0259 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../Makefile; sourceTree = "<group>"; };
 		C1B9A56118B051F0005F0259 /* ogl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ogl.cpp; path = ../../ogl.cpp; sourceTree = "<group>"; };
 		C1B9A56218B051F0005F0259 /* ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ogl.h; path = ../../ogl.h; sourceTree = "<group>"; };
@@ -18,6 +20,8 @@
 		C1B9A55518B051DA005F0259 = {
 			isa = PBXGroup;
 			children = (
+				C136517618B45B2A0051DB07 /* findPattern.cpp */,
+				C136517718B45B2A0051DB07 /* findPattern.h */,
 				C1B9A56418B051F9005F0259 /* ar.cpp */,
 				C1B9A56018B051F0005F0259 /* Makefile */,
 				C1B9A56118B051F0005F0259 /* ogl.cpp */,
@@ -177,6 +181,7 @@
 				C1B9A55F18B051DA005F0259 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -341,10 +341,10 @@ void OGLDraw::_build_opengl_projection_for_intrinsics(
         CV_Assert( top > bottom  );
         CV_Assert( far > near  );
 
-        double left_modified = (near/alpha) * left +  x0;
-        double right_modified = (near/alpha) * right + x0;
-        double bottom_modified = (near/beta) * bottom + y0;
-        double top_modified = (near/beta) * top  + y0;
+        double left_modified = (near/alpha) * left -  x0;
+        double right_modified = (near/alpha) * right - x0;
+        double bottom_modified = (near/beta) * bottom - y0;
+        double top_modified = (near/beta) * top  - y0;
 
         frustumMatrix.setZero();
         frustumMatrix(0,0) = 2.0 * near /( right_modified - left_modified );
