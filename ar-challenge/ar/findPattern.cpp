@@ -12,7 +12,7 @@ using namespace cv;
 
 
 
-double angle2(const Point &p0, const Point &p1, const Point &p2 ) {    double dx0 = p0.x - p1.x;
+double angle(const Point &p0, const Point &p1, const Point &p2 ) {    double dx0 = p0.x - p1.x;
     double dx2 = p2.x - p1.x;
     double dy0 = p0.y - p1.y;
     double dy2 = p2.y - p1.y;
@@ -57,7 +57,7 @@ void findPattern(
         {
             double maxCosine =  0.0;
             for(int j=2; j < 5; ++j) {
-                double cosine = angle2(approx[j-2], approx[j-1], approx[j%4]);
+                double cosine = angle(approx[j-2], approx[j-1], approx[j%4]);
                 maxCosine = MAX(cosine, maxCosine);
             }
             if(maxCosine < 0.3 ) {
@@ -80,6 +80,10 @@ void findPattern(
             int idx = indicesOfSquareContours[i];
             Vec4i h = hierarchy[idx];
             if( h[2] >= 0 ) {
+                Vec4i hc = h[2];
+                if(hc[2] > 0) {
+                    continue;
+                }
                 cout << "next: " << h[0] << ", previous: " <<  h[1] << ", child: " << h[2] << ", parent: " <<  h[3] << endl;       \
                 high_level_contour_area = contourArea(contours[idx], true);
                 low_level_contour_area = contourArea(contours[h[2]], true);
@@ -143,9 +147,6 @@ void findPattern(
         Mat sq2;
         sq.convertTo(sq2, CV_32FC2);
         solvePnP(objectPointsMat, sq2, perFrameAppData.intrinsics, perFrameAppData.distortion, perFrameAppData.rvec, perFrameAppData.tvec);
-        
-        //cout << "rvecs: " << perFrameAppData.rvec.rows << " x " << perFrameAppData.rvec.cols << endl;
-        //cout << "tvecs: " << perFrameAppData.tvec.rows << " x " << perFrameAppData.tvec.cols << endl;
         cout << "intrinsics;" << perFrameAppData.intrinsics;
         Rodrigues( perFrameAppData.rvec, rotMat );
         

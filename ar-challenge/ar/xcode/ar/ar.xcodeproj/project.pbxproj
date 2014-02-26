@@ -14,12 +14,16 @@
 		C1B9A56218B051F0005F0259 /* ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ogl.h; path = ../../ogl.h; sourceTree = "<group>"; };
 		C1B9A56318B051F0005F0259 /* out_camera_data.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = out_camera_data.xml; path = ../../out_camera_data.xml; sourceTree = "<group>"; };
 		C1B9A56418B051F9005F0259 /* ar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ar.cpp; path = ../../ar.cpp; sourceTree = "<group>"; };
+		C1CD6F7918BD1AD9001E1B25 /* oglBackground.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oglBackground.cpp; path = ../../oglBackground.cpp; sourceTree = "<group>"; };
+		C1CD6F7A18BD1AD9001E1B25 /* oglBackground.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = oglBackground.h; path = ../../oglBackground.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		C1B9A55518B051DA005F0259 = {
 			isa = PBXGroup;
 			children = (
+				C1CD6F7918BD1AD9001E1B25 /* oglBackground.cpp */,
+				C1CD6F7A18BD1AD9001E1B25 /* oglBackground.h */,
 				C136517618B45B2A0051DB07 /* findPattern.cpp */,
 				C136517718B45B2A0051DB07 /* findPattern.h */,
 				C1B9A56418B051F9005F0259 /* ar.cpp */,

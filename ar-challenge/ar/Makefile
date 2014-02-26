@@ -32,7 +32,7 @@ CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL -D USE_GLUT  $(INCLU
 LDFLAGS=$(LIBS)
 #LDFLAGS=
 
-OBJS=ar.o ogl.o findPattern.o
+OBJS=ar.o ogl.o findPattern.o oglBackground.o
 PROG=ar
 
 #.PHONY: run

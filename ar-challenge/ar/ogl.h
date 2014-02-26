@@ -11,6 +11,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
+#include "oglBackground.h"
+
 
 class OGLDraw;
 
@@ -43,22 +45,7 @@ class OGLDraw {
         double bottom, double top,
         cv::Mat &frustumMatrix);
     void    _buildModelMatrix(const PerFrameAppData &perFrameAppData, cv::Mat &glViewMatrix);
-    /*
-    void    _build_opengl_projection_for_intrinsics(
-            Eigen::Matrix4d &frustum,
-            int *viewport,
-            double alpha,
-            double beta,
-            double skew,
-            double u0,
-            double v0,
-            int img_width,
-            int img_height,
-            double near_clip,
-            double far_clip );
-    */
     void _drawTetrahedron(const float axisScale) ;
-    
     void _buildViewMatrix(
                                     double ex,
                                     double ey,
@@ -74,14 +61,10 @@ class OGLDraw {
    
     std::string winName;
     cv::Size    winSize;
-    cv::Mat     backgroundImage;
-    bool        bTextureInitialized;
-    unsigned int       backgroundTextureId;
-
-
+    OGLBackground   background;
     //perframe data from app
     public:
-    PerFrameAppData *perFrameAppData;
+        PerFrameAppData *perFrameAppData;
 
 };
 
