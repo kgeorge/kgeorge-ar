@@ -169,7 +169,7 @@ void findPattern(
             circle( capturedImage, square[i], lengthSegment * 0.06, color, -1, 8, 0 );
         }
     }
-
+    
     
     
     

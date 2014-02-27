@@ -5,14 +5,14 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <iostream>
 #if defined(__APPLE__)
-    #include <GLUT/glut.h>
-    #include <OpenGL/gl.h>
-    #include <OpenGL/glu.h>
-#else 
+#include <GLUT/glut.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
 
-    #include <GL/glut.h>
-    #include <GL/gl.h>
-    #include <GL/glu.h>
+#include <GL/glut.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #endif
 #include "ogl.h"
 #include "findPattern.h"
@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
     VideoCapture cap(0);
     if(!cap.isOpened())  // check if we succeeded
         return -1;
-
+    
     PerFrameAppData perFrameAppData;
     FileStorage fs("out_camera_data.xml", FileStorage::READ );
     
@@ -46,14 +46,13 @@ int main(int argc, char** argv) {
     cap >> image;
     win_width = image.cols;
     win_height = image.rows;
-
+    
     const string win_name("kgeorge-ar");
     OGLDraw oglDraw = OGLDraw(
-        Size(win_width, win_height),
-        win_name,
-        &perFrameAppData);
+                              Size(win_width, win_height),
+                              win_name,
+                              &perFrameAppData);
 
-    Scalar color_mark = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
     for (;;) {
         cap >> image;
         findPattern(image, perFrameAppData);
@@ -71,6 +70,6 @@ int main(int argc, char** argv) {
         }
     }
     oglDraw.cleanup();
-
+    
     return 0;
 }

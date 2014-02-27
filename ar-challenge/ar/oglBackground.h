@@ -16,31 +16,31 @@ class OGLDraw;
 
 
 class OGLBackground {
-    public:
-
+public:
+    
     typedef struct {
         float location[2];
         float textureCoords[2];
     } BackgroundVertex;
-
-    public:
+    
+public:
     OGLBackground();
     ~OGLBackground();
     void        processFrame(cv::Mat &frame);
     void        cleanup();
     void        draw();
     
-    protected:
+protected:
     
     void        cleanupGLObjects();
     void        initGLObjects();
     void        initGeometry(int w, int h);
-
+    
     bool        bTextureInitialized;
     unsigned int       backgroundTextureId;
     GLuint          backgroundTextureVerticesVBO;
     GLuint          backgroundTextureIndicesVBO;
-
+    
     BackgroundVertex backgroundTextureVerts[4];
     GLubyte backgroundTextureIndices[6];
     

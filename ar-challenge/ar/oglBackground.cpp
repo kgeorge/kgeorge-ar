@@ -10,11 +10,11 @@ using namespace std;
 using namespace cv;
 
 OGLBackground::OGLBackground():
-        bTextureInitialized(false),
-        backgroundTextureId(0),
-        backgroundTextureVerticesVBO(0),
-        backgroundTextureIndicesVBO(0){
-        }
+bTextureInitialized(false),
+backgroundTextureId(0),
+backgroundTextureVerticesVBO(0),
+backgroundTextureIndicesVBO(0){
+}
 
 
 OGLBackground::~OGLBackground() {
@@ -26,7 +26,7 @@ void OGLBackground::processFrame(Mat &frame) {
 
 void OGLBackground::initGeometry(int w, int h) {
     assert(!bTextureInitialized);
-
+    
     backgroundTextureVerts[0].location[0] = 0.0f;
     backgroundTextureVerts[0].location[1] = 0.0f;
     
@@ -38,7 +38,7 @@ void OGLBackground::initGeometry(int w, int h) {
     
     backgroundTextureVerts[3].location[0] = w;
     backgroundTextureVerts[3].location[1] = h;
-
+    
     backgroundTextureVerts[0].textureCoords[0] = 0.0f;
     backgroundTextureVerts[0].textureCoords[1] = 1.0f;
     
@@ -50,7 +50,7 @@ void OGLBackground::initGeometry(int w, int h) {
     
     backgroundTextureVerts[3].textureCoords[0] = 1.0f;
     backgroundTextureVerts[3].textureCoords[1] = 0.0f;
-
+    
     backgroundTextureIndices[0] = 0;
     backgroundTextureIndices[1] = 1;
     backgroundTextureIndices[2] = 2;
@@ -61,19 +61,19 @@ void OGLBackground::initGeometry(int w, int h) {
 }
 
 void OGLBackground::initGLObjects() {
-     assert(!bTextureInitialized);
+    assert(!bTextureInitialized);
     
     glGenTextures(1, &backgroundTextureId);
     glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
-
+    
     glGenBuffers(1, &backgroundTextureVerticesVBO);
     glBindBuffer(GL_ARRAY_BUFFER, backgroundTextureVerticesVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(BackgroundVertex)*4, (const void *)(&backgroundTextureVerts[0].location[0]), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+    
     glGenBuffers(1, &backgroundTextureIndicesVBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, backgroundTextureIndicesVBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte)*6, (const void *) &backgroundTextureIndices[0], GL_STATIC_DRAW);
@@ -88,167 +88,82 @@ void OGLBackground::cleanupGLObjects() {
     glDeleteTextures(1, &backgroundTextureId);
     bTextureInitialized = false;
     backgroundTextureId = 0;
-
+    
     glDeleteBuffers(1, &backgroundTextureIndicesVBO);
     glDeleteBuffers(1, &backgroundTextureVerticesVBO);
 }
 
 
 
-    void OGLBackground::draw() {
-        
-        const float w = backgroundImage.cols;
-        const float h = backgroundImage.rows;
-        
-        if (!bTextureInitialized){
-            initGeometry(w, h);
-            initGLObjects();
-            bTextureInitialized = true;
-        }
-        
-        glPixelStorei(GL_PACK_ALIGNMENT, 1);
-        glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
-        switch(backgroundImage.channels()) {
-            case 3:
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, backgroundImage.data);
-                break;
-            case 4:
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, backgroundImage.data);
-                break;
-                
-            default:
-                throw runtime_error("unsupported image format");
-                
-        }
-        const GLfloat proj[]              = { 2.0f/w, 0, 0, 0, 0, 2.0f/h, 0, 0, 0, 0, 1, 0, -1, -1, 0, 1 };
-        
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf(proj);
-        
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
-        glBindBuffer(GL_ARRAY_BUFFER, backgroundTextureVerticesVBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, backgroundTextureIndicesVBO);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        
-        
-        glVertexPointer(2, //2 components per location
-                        GL_FLOAT, //type
-                        sizeof(BackgroundVertex),
-                        (const void*)(NULL)
-                        );
-        
-        
-        glTexCoordPointer(2, //2 components per tex coords
-                          GL_FLOAT, //type
-                          sizeof(BackgroundVertex), //stride
-                          (const void *)(NULL + 8)//offset to tex coords
-                          );
-        
-        glColor4f(1,1,1,1);
-        //glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-        
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (char*) NULL+0);
-        
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDisable(GL_TEXTURE_2D);
-
-    }
-
-    void OGLBackground::cleanup() {
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glDeleteTextures(1, &backgroundTextureId);
-        bTextureInitialized = false;
-        backgroundTextureId = 0;
-        cleanupGLObjects();
-    }
-#if 0
-void OGLDraw::_drawBackground(int w, int h) {
-    /*
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-    glVertexAttribPointer(
-        0,  //attribute 0
-        3, //size
-        GL_FLOAT, //type
-        GL_FALSE, //normalized
-        0, //stride
-        (void*)0 //array buffer offset
-    );
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDisableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-     */
-    /*
-    glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
-    glColorPointer(4, //4 components per color
-                   GL_FLOAT, //type
-                   sizeof(Vertex), //stride
-                   (const void *)(NULL + 16)//offset to color
-                   );
-    glVertexPointer(4, //4 components per location
-                    GL_FLOAT, //type
-                    sizeof(Vertex),
-                    (const void*)(NULL)
-                    );
+void OGLBackground::draw() {
     
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_BYTE, (char*) NULL+0);
-
-    glDisableClientState(GL_COLOR_ARRAY);
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    */
-
-            const GLfloat proj[]              = { 2.0f/w, 0, 0, 0, 0, 2.0f/h, 0, 0, 0, 0, 1, 0, -1, -1, 0, 1 };
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadMatrixf(proj);
-
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
-        glBindBuffer(GL_ARRAY_BUFFER, backgroundTextureVerticesVBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, backgroundTextureIndicesVBO);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-
+    const float w = backgroundImage.cols;
+    const float h = backgroundImage.rows;
+    
+    if (!bTextureInitialized){
+        initGeometry(w, h);
+        initGLObjects();
+        bTextureInitialized = true;
+    }
+    
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
+    switch(backgroundImage.channels()) {
+        case 3:
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, backgroundImage.data);
+            break;
+        case 4:
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_BGRA_EXT, GL_UNSIGNED_BYTE, backgroundImage.data);
+            break;
+            
+        default:
+            throw runtime_error("unsupported image format");
+            
+    }
+    const GLfloat proj[]              = { 2.0f/w, 0, 0, 0, 0, 2.0f/h, 0, 0, 0, 0, 1, 0, -1, -1, 0, 1 };
+    
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(proj);
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
+    glBindBuffer(GL_ARRAY_BUFFER, backgroundTextureVerticesVBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, backgroundTextureIndicesVBO);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    
+    
     glVertexPointer(2, //2 components per location
                     GL_FLOAT, //type
                     sizeof(BackgroundVertex),
-                    (const void*)(NULL)
+                    (const void*)(0)
                     );
-
-
+    
+    
     glTexCoordPointer(2, //2 components per tex coords
-                   GL_FLOAT, //type
-                   sizeof(BackgroundVertex), //stride
-                   (const void *)(NULL + 8)//offset to tex coords
-                   );
-
-        glColor4f(1,1,1,1);
-        //glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (char*) NULL+0);
-
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDisable(GL_TEXTURE_2D);
+                      GL_FLOAT, //type
+                      sizeof(BackgroundVertex), //stride
+                      (const void *)(8)//offset to tex coords
+                      );
+    
+    glColor4f(1,1,1,1);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (char*) NULL+0);
+    
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDisable(GL_TEXTURE_2D);
+    
 }
 
-#endif
+void OGLBackground::cleanup() {
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDeleteTextures(1, &backgroundTextureId);
+    bTextureInitialized = false;
+    backgroundTextureId = 0;
+    cleanupGLObjects();
+}
