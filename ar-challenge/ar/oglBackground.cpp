@@ -100,6 +100,7 @@ void OGLBackground::cleanupGLObjects() {
     
     glDeleteBuffers(1, &backgroundTextureIndicesVBO);
     glDeleteBuffers(1, &backgroundTextureVerticesVBO);
+    _cleanupShaders();
 }
 
 
@@ -181,8 +182,11 @@ void OGLBackground::cleanup() {
 }
 
 void OGLBackground::_setupShaders() {
-    backgroundShaderProgramId = ShaderSupport::makeShader( "./shaders/simple.vs",  "./shaders/simple.fs" );
+    backgroundShaderProgramId = ShaderSupport::makeShaderProgram( "./shaders/simple.vs",  "./shaders/simple.fs" );
     
     backgroundTexUniformLocationInShaderProgram = glGetUniformLocation(backgroundShaderProgramId, "backgroundTex");
     validate(backgroundTexUniformLocationInShaderProgram >= 0, string("cant find uniform location: ") + string("backgroundTexUniformLocationInShaderProgram"));
+}
+void OGLBackground::_cleanupShaders() {
+    ShaderSupport::cleanupShaderProgram( backgroundShaderProgramId );
 }

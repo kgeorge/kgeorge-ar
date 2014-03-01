@@ -35,6 +35,7 @@ protected:
     void        initGLObjects();
     void        initGeometry(int w, int h);
     void        _setupShaders();
+    void        _cleanupShaders();
     
     bool        bTextureInitialized;
     unsigned int       backgroundTextureId;

@@ -10,54 +10,54 @@
 using namespace std;
 
 namespace {
-
-void _loadFile(const string & filename, string &shaderSource) {
-    ifstream shaderFile(filename);
-    string line;
-    if(!shaderFile.is_open()) {
-        throw runtime_error(string("cant find file!") + filename);
+    
+    void _loadFile(const string & filename, string &shaderSource) {
+        ifstream shaderFile(filename);
+        string line;
+        if(!shaderFile.is_open()) {
+            throw runtime_error(string("cant find file!") + filename);
+        }
+        while( shaderFile.good() ) {
+            line.clear();
+            getline( shaderFile, line );
+            shaderSource += line + "\n";
+        }
+        shaderFile.close();
     }
-    while( shaderFile.good() ) {
-        line.clear();
-        getline( shaderFile, line );
-        shaderSource += line + "\n";
+    
+    bool _getShaderInfo(GLuint s, string &log) {
+        int infologlength;
+        glGetShaderiv(s, GL_INFO_LOG_LENGTH,&infologlength);
+        if(infologlength > 0) {
+            int charsRead;
+            char * info = new char[infologlength];
+            glGetShaderInfoLog(s, infologlength, &charsRead, info);
+            log.assign(info);
+            delete [] info;
+            return true;
+        }
+        return false;
     }
-    shaderFile.close();
-}
-
-bool _getShaderInfo(GLuint s, string &log) {
-    int infologlength;
-    glGetShaderiv(s, GL_INFO_LOG_LENGTH,&infologlength);
-    if(infologlength > 0) {
-        int charsRead;
-        char * info = new char[infologlength];
-        glGetShaderInfoLog(s, infologlength, &charsRead, info);
-        log.assign(info);
-        delete [] info;
-        return true;
+    
+    
+    GLuint _createShader(const string &filename, GLenum shaderType) {
+        string shaderSource;
+        _loadFile(filename,  shaderSource);
+        const char *shaderSourceChar = shaderSource.c_str();
+        GLint s = glCreateShader( shaderType );
+        int shaderSourceLen = static_cast<int>(shaderSource.length());
+        glShaderSource(s, 1, const_cast<const char**> (&shaderSourceChar), &shaderSourceLen);
+        GLint shaderCompiled;
+        glCompileShader(s);
+        glGetShaderiv(s, GL_COMPILE_STATUS, &shaderCompiled);
+        string log;
+        _getShaderInfo(s,log);
+        validate(shaderCompiled != GL_FALSE, string("shader compilation failed: ") + log);
+        if(!log.empty()) {
+            cerr << "Warning:" << log.c_str();
+        }
+        return s;
     }
-    return false;
-}
-
-
-GLuint _createShader(const string &filename, GLenum shaderType) {
-    string shaderSource;
-    _loadFile(filename,  shaderSource);
-    const char *shaderSourceChar = shaderSource.c_str();
-    GLint s = glCreateShader( shaderType );
-    int shaderSourceLen = static_cast<int>(shaderSource.length());
-    glShaderSource(s, 1, const_cast<const char**> (&shaderSourceChar), &shaderSourceLen);
-    GLint shaderCompiled;
-    glCompileShader(s);
-    glGetShaderiv(s, GL_COMPILE_STATUS, &shaderCompiled);
-    string log;
-    _getShaderInfo(s,log);
-    validate(shaderCompiled != GL_FALSE, string("shader compilation failed: ") + log);
-    if(!log.empty()) {
-        cerr << "Warning:" << log.c_str();
-    }
-    return s;
-}
     
     void _linkShader(GLuint programId) {
         GLint shaderLinked;
@@ -90,7 +90,7 @@ GLuint _createShader(const string &filename, GLenum shaderType) {
 }
 namespace ShaderSupport {
     
-    GLuint makeShader(const string &filepath_vs, const std::string &filepath_fs) {
+    GLuint makeShaderProgram(const string &filepath_vs, const std::string &filepath_fs) {
         
         GLuint programId = glCreateProgram();
         
@@ -107,4 +107,23 @@ namespace ShaderSupport {
         _validateShader(programId);
         return programId;
     }
+    
+    void cleanupShaderProgram(GLuint programId) {
+        const GLsizei kMaxNumShadersAttachedToAProgram=10;
+        GLuint shadersAttached[kMaxNumShadersAttachedToAProgram];
+        GLsizei numShadersAttachedToThisProgram;
+        glGetAttachedShaders(programId,
+                             kMaxNumShadersAttachedToAProgram,
+                             &numShadersAttachedToThisProgram,
+                             shadersAttached
+                             );
+        for(GLsizei i=0; i < numShadersAttachedToThisProgram; i++) {
+            glDetachShader(programId, shadersAttached[i]);
+        }
+        for(GLsizei i=0; i < numShadersAttachedToThisProgram; i++) {
+            glDeleteShader(shadersAttached[i]);
+        }
+        glDeleteProgram(programId);
+    }
+    
 }

@@ -10,7 +10,8 @@
 #include <GLFW/glfw3.h>
 
 namespace ShaderSupport {
-    GLuint makeShader(const std::string &filename_vs, const std::string &filename_fs);
+    GLuint makeShaderProgram(const std::string &filename_vs, const std::string &filename_fs);
+    void cleanupShaderProgram(GLuint programId);
 };
 
 
