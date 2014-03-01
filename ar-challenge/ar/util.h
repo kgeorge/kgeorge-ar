@@ -3,14 +3,6 @@
 #include <string>
 
 
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
-GLuint createShader(const std::string &filename, GLenum shaderType);
+void validate(bool bval, const std::string& msg);
 
 #endif //UTIL_H_

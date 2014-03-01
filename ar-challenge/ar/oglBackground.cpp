@@ -3,8 +3,16 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
 #include <iostream>
+#include <glew.h>
+#define GLFW_INCLUDE_GL3  /* don't drag in legacy GL headers. */
+#define GLFW_NO_GLU       /* don't drag in the old GLU lib - unless you must. */
+
+#include <GLFW/glfw3.h>
 #include <math.h>
+
 #include "oglBackground.h"
+#include "shaderSupport.h"
+#include "util.h"
 
 using namespace std;
 using namespace cv;
@@ -13,7 +21,9 @@ OGLBackground::OGLBackground():
 bTextureInitialized(false),
 backgroundTextureId(0),
 backgroundTextureVerticesVBO(0),
-backgroundTextureIndicesVBO(0){
+backgroundTextureIndicesVBO(0),
+backgroundShaderProgramId(0),
+backgroundTexUniformLocationInShaderProgram(0){
 }
 
 
@@ -68,7 +78,6 @@ void OGLBackground::initGLObjects() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
-    
     glGenBuffers(1, &backgroundTextureVerticesVBO);
     glBindBuffer(GL_ARRAY_BUFFER, backgroundTextureVerticesVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(BackgroundVertex)*4, (const void *)(&backgroundTextureVerts[0].location[0]), GL_STATIC_DRAW);
@@ -78,12 +87,12 @@ void OGLBackground::initGLObjects() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, backgroundTextureIndicesVBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLubyte)*6, (const void *) &backgroundTextureIndices[0], GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    _setupShaders();
 }
 
 
 
 void OGLBackground::cleanupGLObjects() {
-    
     glBindTexture(GL_TEXTURE_2D, 0);
     glDeleteTextures(1, &backgroundTextureId);
     bTextureInitialized = false;
@@ -105,8 +114,9 @@ void OGLBackground::draw() {
         initGLObjects();
         bTextureInitialized = true;
     }
-    
+    glUseProgram(backgroundShaderProgramId);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
     switch(backgroundImage.channels()) {
         case 3:
@@ -120,6 +130,8 @@ void OGLBackground::draw() {
             throw runtime_error("unsupported image format");
             
     }
+    
+    glUniform1i(backgroundShaderProgramId, 0);
     const GLfloat proj[]              = { 2.0f/w, 0, 0, 0, 0, 2.0f/h, 0, 0, 0, 0, 1, 0, -1, -1, 0, 1 };
     
     glMatrixMode(GL_PROJECTION);
@@ -142,7 +154,6 @@ void OGLBackground::draw() {
                     (const void*)(0)
                     );
     
-    
     glTexCoordPointer(2, //2 components per tex coords
                       GL_FLOAT, //type
                       sizeof(BackgroundVertex), //stride
@@ -157,6 +168,7 @@ void OGLBackground::draw() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDisable(GL_TEXTURE_2D);
+    glUseProgram(0);
     
 }
 
@@ -166,4 +178,11 @@ void OGLBackground::cleanup() {
     bTextureInitialized = false;
     backgroundTextureId = 0;
     cleanupGLObjects();
+}
+
+void OGLBackground::_setupShaders() {
+    backgroundShaderProgramId = ShaderSupport::makeShader( "./shaders/simple.vs",  "./shaders/simple.fs" );
+    
+    backgroundTexUniformLocationInShaderProgram = glGetUniformLocation(backgroundShaderProgramId, "backgroundTex");
+    validate(backgroundTexUniformLocationInShaderProgram >= 0, string("cant find uniform location: ") + string("backgroundTexUniformLocationInShaderProgram"));
 }

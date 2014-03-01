@@ -10,6 +10,8 @@
 		C136517618B45B2A0051DB07 /* findPattern.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = findPattern.cpp; path = ../../findPattern.cpp; sourceTree = "<group>"; };
 		C136517718B45B2A0051DB07 /* findPattern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = findPattern.h; path = ../../findPattern.h; sourceTree = "<group>"; };
 		C179CFC818BFE169002F4B46 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../main.cpp; sourceTree = "<group>"; };
+		C1857C3E18C1074D006B12A6 /* shaderSupport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = shaderSupport.cpp; path = ../../shaderSupport.cpp; sourceTree = "<group>"; };
+		C1857C3F18C1074D006B12A6 /* shaderSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shaderSupport.h; path = ../../shaderSupport.h; sourceTree = "<group>"; };
 		C1B9A56018B051F0005F0259 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../Makefile; sourceTree = "<group>"; };
 		C1B9A56118B051F0005F0259 /* ogl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ogl.cpp; path = ../../ogl.cpp; sourceTree = "<group>"; };
 		C1B9A56218B051F0005F0259 /* ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ogl.h; path = ../../ogl.h; sourceTree = "<group>"; };
@@ -27,6 +29,8 @@
 		C1B9A55518B051DA005F0259 = {
 			isa = PBXGroup;
 			children = (
+				C1857C3E18C1074D006B12A6 /* shaderSupport.cpp */,
+				C1857C3F18C1074D006B12A6 /* shaderSupport.h */,
 				C179CFC818BFE169002F4B46 /* main.cpp */,
 				C1CD6F7D18BE4F7E001E1B25 /* simple.fs */,
 				C1CD6F7E18BE4F7E001E1B25 /* simple.vs */,

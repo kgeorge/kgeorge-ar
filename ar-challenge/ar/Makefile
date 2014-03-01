@@ -24,16 +24,16 @@ LIBS=\
     -F /System/Library/Frameworks  -framework IOKit -framework Cocoa -framework QuartzCore  -framework OpenGL -framework AGL
 
 
-GLFW-INCLUDES = $(shell /usr/local/bin/pkg-config --cflags glfw3)
-GLFW-LIBS = $(shell /usr/local/bin/pkg-config --libs glfw3)
-    
+GL-EXTRA-INCLUDES = $(shell /usr/local/bin/pkg-config --cflags glew) $(shell /usr/local/bin/pkg-config --cflags glfw3)
+GL-EXTRA-LIBS = $(shell /usr/local/bin/pkg-config --libs glew) $(shell /usr/local/bin/pkg-config --libs glfw3)
+
+
 
 CXX=clang++
-CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL -D USE_GLUT  $(INCLUDES) $(QT_INCLUDES) $(GLFW-INCLUDES)
-LDFLAGS=$(LIBS)  $(GLFW-LIBS)
-#LDFLAGS=
+CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL -D USE_GLUT  $(INCLUDES) $(QT_INCLUDES) $(GL-EXTRA-INCLUDES)
+LDFLAGS=$(LIBS)  $(GL-EXTRA-LIBS)
 
-OBJS=ar.o ogl.o findPattern.o oglBackground.o util.o
+OBJS=main.o ogl.o findPattern.o oglBackground.o util.o shaderSupport.o
 PROG=ar
 
 #.PHONY: run

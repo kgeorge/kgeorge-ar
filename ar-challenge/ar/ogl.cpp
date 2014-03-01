@@ -2,6 +2,13 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
+
+#include <glew.h>
+#define GLFW_INCLUDE_GL3  /* don't drag in legacy GL headers. */
+#define GLFW_NO_GLU       /* don't drag in the old GLU lib - unless you must. */
+
+#include <GLFW/glfw3.h>
+
 #include <iostream>
 #include <math.h>
 #include "ogl.h"
@@ -21,17 +28,10 @@ OGLDraw::OGLDraw(
                  PerFrameAppData *perFrameAppData):
 winName(winName),
 winSize(winSize),
-perFrameAppData(perFrameAppData){
-    namedWindow(winName,  WINDOW_OPENGL);
-    resizeWindow(winName, winSize.width, winSize.height);
-    setOpenGlContext(winName);
-    setOpenGlDrawCallback(winName, OGLDrawCallback, this);
-}
+perFrameAppData(perFrameAppData){}
 
 
 OGLDraw::~OGLDraw() {
-    //cleanup();
-    
 }
 
 void OGLDraw::draw() {
@@ -40,7 +40,6 @@ void OGLDraw::draw() {
     if(perFrameAppData->bValidFrame) {
         _drawAugmentedFrame();
     }
-    glFlush();
 }
 
 void OGLDraw::cleanup() {
@@ -52,6 +51,7 @@ void OGLDraw::cleanup() {
 
 void OGLDraw::processFrame( Mat &frame) {
     background.processFrame(frame);
+    draw();
 }
 
 

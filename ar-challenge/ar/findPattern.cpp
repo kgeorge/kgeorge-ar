@@ -5,6 +5,8 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <iostream>
 #include "findPattern.h"
+#include "ogl.h"
+
 
 
 using namespace std;

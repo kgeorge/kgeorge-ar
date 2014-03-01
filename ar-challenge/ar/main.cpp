@@ -1,4 +1,9 @@
 #include <iostream>
+
+#include <glew.h>
+#define GLFW_INCLUDE_GL3  /* don't drag in legacy GL headers. */
+#define GLFW_NO_GLU       /* don't drag in the old GLU lib - unless you must. */
+
 #include <GLFW/glfw3.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -32,14 +37,17 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 int main(int argc, char **argv) {
     GLFWwindow* window;
     const GLubyte * strGLVersion;
-    glfwSetErrorCallback(error_callback);
+     glfwSetErrorCallback(error_callback);
     if (!glfwInit())
         exit(EXIT_FAILURE);
-    //
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    /*
+    glfwSetErrorCallback(error_callback);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+     */
 
     window = glfwCreateWindow(400, 300, "check-opengl", NULL, NULL);
     if (!window)
@@ -48,12 +56,15 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
     glfwMakeContextCurrent(window);
+    
+    glewInit();
+
     glfwSetKeyCallback(window, key_callback);
     glfwSwapInterval(0);
     strGLVersion = glGetString(GL_VERSION);
     cout << "GL_VERSION:" << strGLVersion << endl;
-    
-    
+    const GLubyte * strGLShadingLanguageVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
+    cout << "GL_VERSION:" << strGLShadingLanguageVersion << endl;
     
     double delay = 30.0;
     VideoCapture cap(0);
@@ -79,6 +90,11 @@ int main(int argc, char **argv) {
     //win_height = image.rows;
     const string win_name("kgeorge-ar");
     
+    OGLDraw oglDraw = OGLDraw(
+                              Size(win_width, win_height),
+                              win_name,
+                              &perFrameAppData);
+
     
     
     
@@ -90,15 +106,9 @@ int main(int argc, char **argv) {
         Mat temp = image.clone();
         undistort(temp, image, perFrameAppData.intrinsics, perFrameAppData.distortion);
         
-        oglDraw.processFrame(  image);
-        oglDraw.updateWindow();
         
-        //key behavior
-        char key = (char)waitKey(delay);
-        if (key == ESC_KEY ) {
-            break;
-
         
+        oglDraw.processFrame( image );
         
         
         glfwSwapBuffers(window);
