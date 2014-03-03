@@ -19,11 +19,21 @@ using namespace cv;
 
 OGLBackground::OGLBackground():
 bTextureInitialized(false),
+
 backgroundTextureId(0),
+
+backgroundVertexArray(0),
 backgroundTextureVerticesVBO(0),
 backgroundTextureIndicesVBO(0),
+
 backgroundShaderProgramId(0),
-backgroundTexUniformLocationInShaderProgram(0){
+
+backgroundTexUniformLocation(0),
+backgroundPositionAttributeLocation(0),
+backgroundUVAttributeLocation(0),
+backgroundModelUniformLocation(0),
+backgroundViewUniformLocation(0),
+backgroundProjectionUniformLocation(0){
 }
 
 
@@ -78,6 +88,9 @@ void OGLBackground::initGLObjects() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
+    glGenVertexArrays(1, &backgroundVertexArray);
+    glBindVertexArray(backgroundVertexArray);
+    
     glGenBuffers(1, &backgroundTextureVerticesVBO);
     glBindBuffer(GL_ARRAY_BUFFER, backgroundTextureVerticesVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(BackgroundVertex)*4, (const void *)(&backgroundTextureVerts[0].location[0]), GL_STATIC_DRAW);
@@ -100,6 +113,7 @@ void OGLBackground::cleanupGLObjects() {
     
     glDeleteBuffers(1, &backgroundTextureIndicesVBO);
     glDeleteBuffers(1, &backgroundTextureVerticesVBO);
+    glDeleteVertexArrays(1, &backgroundVertexArray);
     _cleanupShaders();
 }
 
@@ -115,8 +129,12 @@ void OGLBackground::draw() {
         initGLObjects();
         bTextureInitialized = true;
     }
+    //use the background shader program
     glUseProgram(backgroundShaderProgramId);
+    
+    //texture mapping
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glEnable(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
     switch(backgroundImage.channels()) {
@@ -132,40 +150,49 @@ void OGLBackground::draw() {
             
     }
     
-    glUniform1i(backgroundShaderProgramId, 0);
+    //get uniform and attribute locations
+    _getUniformAndAttributeLocations();
+    
+    
+    //update model, view, projection uniforms
     const GLfloat proj[]              = { 2.0f/w, 0, 0, 0, 0, 2.0f/h, 0, 0, 0, 0, 1, 0, -1, -1, 0, 1 };
-    
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(proj);
-    
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, backgroundTextureId);
+    const GLfloat modelOrView[]              = { 1.0f, 0, 0, 0,    0, 1.0f, 0, 0,    0, 0, 1.0f, 0,   0, 0, 0, 1.0f };
+    glUniformMatrix4fv(backgroundProjectionUniformLocation, 1, GL_FALSE, proj);
+    glUniformMatrix4fv(backgroundModelUniformLocation, 1, GL_FALSE, modelOrView);
+    glUniformMatrix4fv(backgroundViewUniformLocation, 1, GL_FALSE, modelOrView);
+
+    //vetex buffer object activation
     glBindBuffer(GL_ARRAY_BUFFER, backgroundTextureVerticesVBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, backgroundTextureIndicesVBO);
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    
-    
-    glVertexPointer(2, //2 components per location
+    glEnableVertexAttribArray(backgroundPositionAttributeLocation);
+    glEnableVertexAttribArray(backgroundUVAttributeLocation);
+    glVertexAttribPointer(
+                    backgroundPositionAttributeLocation,
+                    2, //2 components per location
                     GL_FLOAT, //type
+                    GL_FALSE, //normalized
                     sizeof(BackgroundVertex),
                     (const void*)(0)
                     );
-    
-    glTexCoordPointer(2, //2 components per tex coords
+    glVertexAttribPointer(
+                      backgroundUVAttributeLocation,
+                      2, //2 components per tex coords
                       GL_FLOAT, //type
+                      GL_TRUE,
                       sizeof(BackgroundVertex), //stride
                       (const void *)(8)//offset to tex coords
                       );
     
+    //backgroundTexture in shader should point to texture unit0
+    glUniform1i(backgroundTexUniformLocation, 0);
+    
+    //draw elements
     glColor4f(1,1,1,1);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, (char*) NULL+0);
     
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    //disable, what was enabled
+    glDisableVertexAttribArray(backgroundPositionAttributeLocation);
+    glDisableVertexAttribArray(backgroundUVAttributeLocation);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glDisable(GL_TEXTURE_2D);
@@ -183,10 +210,33 @@ void OGLBackground::cleanup() {
 
 void OGLBackground::_setupShaders() {
     backgroundShaderProgramId = ShaderSupport::makeShaderProgram( "./shaders/simple.vs",  "./shaders/simple.fs" );
-    
-    backgroundTexUniformLocationInShaderProgram = glGetUniformLocation(backgroundShaderProgramId, "backgroundTex");
-    validate(backgroundTexUniformLocationInShaderProgram >= 0, string("cant find uniform location: ") + string("backgroundTexUniformLocationInShaderProgram"));
 }
+
+void OGLBackground::_getUniformAndAttributeLocations() {
+    backgroundModelUniformLocation = glGetUniformLocation(backgroundShaderProgramId, "model");
+    validate(backgroundModelUniformLocation >= 0, string("cant find uniform location: ") + string("model"));
+    
+    
+    backgroundViewUniformLocation = glGetUniformLocation(backgroundShaderProgramId, "view");
+    validate(backgroundViewUniformLocation >= 0, string("cant find uniform location: ") + string("view"));
+    
+    backgroundProjectionUniformLocation = glGetUniformLocation(backgroundShaderProgramId, "projection");
+    validate(backgroundProjectionUniformLocation >= 0, string("cant find uniform location: ") + string("projection"));
+
+    
+
+    backgroundPositionAttributeLocation = glGetAttribLocation(backgroundShaderProgramId, "position");
+    validate(backgroundPositionAttributeLocation >= 0, string("cant find attribute location: ") + string("position"));
+    
+    
+    backgroundUVAttributeLocation = glGetAttribLocation(backgroundShaderProgramId, "uv");
+    validate(backgroundUVAttributeLocation >= 0, string("cant find attribute location: ") + string("uv"));
+    
+    backgroundTexUniformLocation = glGetUniformLocation(backgroundShaderProgramId, "tex");
+    validate(backgroundTexUniformLocation >= 0, string("cant find uniform location: ") + string("backgroundTexUniformLocation"));
+    
+}
+
 void OGLBackground::_cleanupShaders() {
     ShaderSupport::cleanupShaderProgram( backgroundShaderProgramId );
 }

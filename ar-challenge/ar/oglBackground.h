@@ -36,17 +36,29 @@ protected:
     void        initGeometry(int w, int h);
     void        _setupShaders();
     void        _cleanupShaders();
-    
+    void        _getUniformAndAttributeLocations();
+
+    cv::Mat     backgroundImage;
     bool        bTextureInitialized;
-    unsigned int       backgroundTextureId;
-    GLuint          backgroundTextureVerticesVBO;
-    GLuint          backgroundTextureIndicesVBO;
-    
+
     BackgroundVertex backgroundTextureVerts[4];
     GLubyte backgroundTextureIndices[6];
+
+
+    unsigned int       backgroundTextureId;
+
+    GLuint          backgroundVertexArray;
+    GLuint          backgroundTextureVerticesVBO;
+    GLuint          backgroundTextureIndicesVBO;
+
     GLuint  backgroundShaderProgramId;
-    GLint   backgroundTexUniformLocationInShaderProgram;
-    cv::Mat     backgroundImage;
+    
+    GLint   backgroundTexUniformLocation;
+    GLint backgroundPositionAttributeLocation;
+    GLint backgroundUVAttributeLocation;
+    GLint backgroundModelUniformLocation;
+    GLint backgroundViewUniformLocation;
+    GLint backgroundProjectionUniformLocation;
 };
 
 

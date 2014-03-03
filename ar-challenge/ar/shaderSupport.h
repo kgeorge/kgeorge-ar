@@ -12,6 +12,7 @@
 namespace ShaderSupport {
     GLuint makeShaderProgram(const std::string &filename_vs, const std::string &filename_fs);
     void cleanupShaderProgram(GLuint programId);
+    void validateShader(GLuint programId);
 };
 
 

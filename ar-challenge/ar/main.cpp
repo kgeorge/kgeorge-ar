@@ -40,24 +40,27 @@ int main(int argc, char **argv) {
      glfwSetErrorCallback(error_callback);
     if (!glfwInit())
         exit(EXIT_FAILURE);
-    /*
+    
     glfwSetErrorCallback(error_callback);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-     */
+     
 
-    window = glfwCreateWindow(400, 300, "check-opengl", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "check-opengl", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
     glfwMakeContextCurrent(window);
-    
-    glewInit();
+    glewExperimental = true;
+    if(glewInit() != GLEW_OK) {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
 
     glfwSetKeyCallback(window, key_callback);
     glfwSwapInterval(0);
@@ -66,7 +69,6 @@ int main(int argc, char **argv) {
     const GLubyte * strGLShadingLanguageVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
     cout << "GL_VERSION:" << strGLShadingLanguageVersion << endl;
     
-    double delay = 30.0;
     VideoCapture cap(0);
     if(!cap.isOpened())  // check if we succeeded
         return -1;
@@ -83,8 +85,8 @@ int main(int argc, char **argv) {
     
     Mat image;
     RNG rng(12345);
-    int win_width = 400;
-    int win_height = 300;
+    int win_width = 800;
+    int win_height = 600;
     cap >> image;
     //win_width = image.cols;
     //win_height = image.rows;

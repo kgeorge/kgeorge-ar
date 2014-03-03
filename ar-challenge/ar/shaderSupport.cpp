@@ -73,7 +73,11 @@ namespace {
         }
         return;
     }
-    void _validateShader(GLuint programId) {
+}
+namespace ShaderSupport {
+
+    
+    void validateShader(GLuint programId) {
         glValidateProgram(programId);
         GLint shaderValidated;
         glGetProgramiv(programId, GL_VALIDATE_STATUS, &shaderValidated);
@@ -87,8 +91,8 @@ namespace {
         }
         return;
     }
-}
-namespace ShaderSupport {
+
+    
     
     GLuint makeShaderProgram(const string &filepath_vs, const std::string &filepath_fs) {
         
@@ -104,7 +108,7 @@ namespace ShaderSupport {
         glAttachShader(programId, fs);
         
         _linkShader(programId);
-        _validateShader(programId);
+        
         return programId;
     }
     

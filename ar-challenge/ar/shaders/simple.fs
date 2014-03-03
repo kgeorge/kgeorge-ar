@@ -1,6 +1,8 @@
-#version 120
-uniform sampler2D backgroundTex;
-varying vec2 vTexCoord;
+#version 330
+uniform sampler2D tex;
+in vec2 vTexCoord;
+out vec4 fragColor;
 void main(void) {
-    gl_FragColor = texture2D(backgroundTex, vTexCoord);
+    vec4 col = texture(tex, vTexCoord);
+    fragColor = col;
 }
