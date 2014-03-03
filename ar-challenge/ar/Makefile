@@ -1,7 +1,8 @@
-INCLUDES = $(shell /usr/local/bin/pkg-config --cflags opencv)
-QT_INCLUDES = $(shell /usr/local/bin/pkg-config --cflags QtOpenGL)
+OPENCV-INCLUDES = $(shell /usr/local/bin/pkg-config --cflags opencv)
+
 OPENCV-LIBS-DIR = $(shell /usr/local/bin/pkg-config --libs opencv | dirname `awk '{ print $$1 }'`)
-LIBS=\
+
+OPENCV-LIBS=\
     $(OPENCV-LIBS-DIR)/libopencv_calib3d.dylib \
     $(OPENCV-LIBS-DIR)/libopencv_contrib.dylib \
     $(OPENCV-LIBS-DIR)/libopencv_core.dylib   \
@@ -21,17 +22,17 @@ LIBS=\
     $(OPENCV-LIBS-DIR)/libopencv_ts.a \
     $(OPENCV-LIBS-DIR)/libopencv_video.dylib \
     $(OPENCV-LIBS-DIR)/libopencv_videostab.dylib \
-    -F /System/Library/Frameworks  -framework IOKit -framework Cocoa -framework QuartzCore  -framework OpenGL -framework AGL
+    -F /System/Library/Frameworks   -framework OpenGL -framework AGL
 
 
 GL-EXTRA-INCLUDES = $(shell /usr/local/bin/pkg-config --cflags glew) $(shell /usr/local/bin/pkg-config --cflags glfw3)
-GL-EXTRA-LIBS = $(shell /usr/local/bin/pkg-config --libs glew) $(shell /usr/local/bin/pkg-config --libs glfw3)
+GL-EXTRA-LIBS = $(shell /usr/local/bin/pkg-config --libs glew) $(shell /usr/local/bin/pkg-config --libs glfw3) -F /System/Library/Frameworks  -framework IOKit -framework Cocoa -framework QuartzCore
 
 
 
 CXX=clang++
-CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL -D USE_GLUT  $(INCLUDES) $(QT_INCLUDES) $(GL-EXTRA-INCLUDES)
-LDFLAGS=$(LIBS)  $(GL-EXTRA-LIBS)
+CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL  $(OPENCV-INCLUDES)  $(GL-EXTRA-INCLUDES)
+LDFLAGS= $(OPENCV-LIBS)  $(GL-EXTRA-LIBS)
 
 OBJS=main.o ogl.o findPattern.o oglBackground.o util.o shaderSupport.o
 PROG=ar
