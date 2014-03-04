@@ -1,18 +1,13 @@
-   #include <iostream>
-
+#include <iostream>
 #include <sstream>
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/calib3d/calib3d.hpp>
-#include <opencv2/highgui/highgui.hpp>
-
-#include "settings.hpp"
+#include "calib3d.h"
 
 using namespace cv;
 using namespace std;
 
-enum { DETECTION = 0, CAPTURING = 1, CALIBRATED = 2 };
+const char ESC_KEY = 27;
+const cv::Scalar RED(0,0,255);
+const cv::Scalar GREEN(0,255,0);
 
 
 static void calcBoardCornerPositions(
@@ -276,6 +271,75 @@ static bool runCalibrationAndSave(
     return runCalibrationOk;
 }
 
+
+void Calib3d::processFrame() {
+    Mat view = ps->nextImage();
+    if( mode == CAPTURING && imagePoints.size() >= (unsigned)ps->nrFrames )
+    {
+        if( runCalibrationAndSave(*ps, view.size(), imagePoints, cameraMatrix, distCoeffs))
+            mode = CALIBRATED;
+        else
+            mode = DETECTION;
+    }
+    imageSize = view.size();  // Format input image.
+    
+    if( ps->flipVertical )    flip( view, view, 0 );
+    vector<Point2f> pointBuf;
+    bool found;
+    switch( ps->calibrationPattern ) // Find feature points on the input format
+    {
+        case Settings::CHESSBOARD:
+            found = findChessboardCorners( view, ps->boardSize, pointBuf,
+                                          CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE);
+            break;
+        case Settings::CIRCLES_GRID:
+            found = findCirclesGrid( view, ps->boardSize, pointBuf );
+            break;
+        case Settings::ASYMMETRIC_CIRCLES_GRID:
+            found = findCirclesGrid( view, ps->boardSize, pointBuf, CALIB_CB_ASYMMETRIC_GRID );
+            break;
+        default:
+            found = false;
+            break;
+    }
+    if(found) {
+        if( ps->calibrationPattern == Settings::CHESSBOARD) {
+            Mat viewGray;
+            cvtColor( view, viewGray, CV_BGR2GRAY );
+            cornerSubPix(
+                         viewGray,
+                         pointBuf,
+                         Size(11,11),
+                         Size(-1,-1),
+                         TermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1 )
+                         );
+            
+            
+        }
+        if( mode == CAPTURING &&
+           (!ps->inputCapture.isOpened()||  clock() - prevTimestamp > ps->delay*1e-3*CLOCKS_PER_SEC )
+           ) {
+            imagePoints.push_back(pointBuf);
+            prevTimestamp = clock();
+        }
+        drawChessboardCorners( view, ps->boardSize, pointBuf, found );
+    }
+    
+    string msg = (mode == CAPTURING) ? "100/100" : mode == CALIBRATED ? "Calibrated" : "Press 'g' to start";
+    int baseLine = 0;
+    Size textSize = getTextSize(msg, 1, 1, 1, &baseLine);
+    Point textOrigin(view.cols - 2*textSize.width - 10, view.rows - 2*baseLine - 10);
+    if( mode == CAPTURING )
+    {
+        msg = format( "%d/%d", (int)imagePoints.size(), ps->nrFrames );
+    }
+    background.processFrame(view);
+    background.draw();
+    
+}
+
+#if 0
+
 int main( int argc, char *argv[] ) {
     Mat  cameraMatrix, distCoeffs;
     Size imageSize;
@@ -288,7 +352,7 @@ int main( int argc, char *argv[] ) {
         
     }
     namedWindow("calibrate", WINDOW_OPENGL);
-    resizeWindow("calibrate", 800, 640);
+    resizeWindow("calibrate", 400, 300);
     
     fs["Settings"] >> s;
     fs.release();
@@ -386,3 +450,4 @@ int main( int argc, char *argv[] ) {
     }
      
 }
+#endif

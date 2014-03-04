@@ -1,9 +1,8 @@
-INCLUDES = $(shell /usr/local/bin/pkg-config --cflags opencv)
-INCLUDES-EIGEN=$(shell /usr/local/bin/pkg-config --cflags opencv)
+OPENCV-INCLUDES = $(shell /usr/local/bin/pkg-config --cflags opencv)
+
 OPENCV-LIBS-DIR = $(shell /usr/local/bin/pkg-config --libs opencv | dirname `awk '{ print $$1 }'`)
-EIGEN-LIBS = $(shell /usr/local/bin/pkg-config --libs eigen3)
-EIGEN-INCLUDES=$(shell /usr/local/bin/pkg-config --cflags eigen3)
-LIBS=\
+
+OPENCV-LIBS=\
     $(OPENCV-LIBS-DIR)/libopencv_calib3d.dylib \
     $(OPENCV-LIBS-DIR)/libopencv_contrib.dylib \
     $(OPENCV-LIBS-DIR)/libopencv_core.dylib   \
@@ -23,30 +22,40 @@ LIBS=\
     $(OPENCV-LIBS-DIR)/libopencv_ts.a \
     $(OPENCV-LIBS-DIR)/libopencv_video.dylib \
     $(OPENCV-LIBS-DIR)/libopencv_videostab.dylib \
-    -F /System/Library/Frameworks -framework OpenGL -framework AGL
+    -F /System/Library/Frameworks   -framework OpenGL -framework AGL
 
 
+GL-EXTRA-INCLUDES = $(shell /usr/local/bin/pkg-config --cflags glew) $(shell /usr/local/bin/pkg-config --cflags glfw3)
+GL-EXTRA-LIBS = $(shell /usr/local/bin/pkg-config --libs glew) $(shell /usr/local/bin/pkg-config --libs glfw3) -F /System/Library/Frameworks  -framework IOKit -framework Cocoa -framework QuartzCore
 
-
-
+LOCAL-INCLUDES= -I./../common
+LOCAL-LIBS= -L./../common/build -lKgCommon
 
 CXX=clang++
-CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL -D USE_GLUT  $(INCLUDES) $(EIGEN-INCLUDES)
-LDFLAGS=$(LIBS) $(EIGEN-LIBS)
+CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL  $(OPENCV-INCLUDES)  $(GL-EXTRA-INCLUDES) $(LOCAL-INCLUDES)
+LDFLAGS= $(OPENCV-LIBS)  $(GL-EXTRA-LIBS) $(LOCAL-LIBS)
 
-OBJS=calib3d.o settings.o
-PROG=calib3d
+BUILD-DIR=build
+OBJS=$(addprefix $(BUILD-DIR)/, calib3d.o main.o settings.o)
+PROG=$(BUILD-DIR)/calib3d
+
+#.PHONY: run
+
+#run: augrel
+#	./build/augrel
 
 all: $(PROG)
 
+#order-only-prerequisites
+$(OBJS): | $(BUILD-DIR)
 
 $(PROG): $(OBJS)
-	#@echo hihihi $(OPENCV-LIBS-1)
 	$(CXX) -v -o $(PROG) $(OBJS) $(LDFLAGS)
 
-%.o: %.cpp
-	$(CXX) -c $(CXXFLAGS) $<
+$(BUILD-DIR)/%.o: %.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
+$(BUILD-DIR):
+	mkdir -p $(BUILD-DIR)
 clean:
-	rm $(OBJS); rm ar
-
+	rm $(OBJS); rm $(PROG)

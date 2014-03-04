@@ -12,12 +12,16 @@
 		C1502E1C18B04D2400CBE2B4 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; name = Makefile; path = ../../Makefile; sourceTree = "<group>"; };
 		C1502E1D18B04D2400CBE2B4 /* settings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = settings.cpp; path = ../../settings.cpp; sourceTree = "<group>"; };
 		C1502E1E18B04D2400CBE2B4 /* settings.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = settings.hpp; path = ../../settings.hpp; sourceTree = "<group>"; };
+		C1857C4018C40423006B12A6 /* calib3d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = calib3d.h; path = ../../calib3d.h; sourceTree = "<group>"; };
+		C1857C4118C40430006B12A6 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		C1502E0F18B04D1300CBE2B4 = {
 			isa = PBXGroup;
 			children = (
+				C1857C4118C40430006B12A6 /* main.cpp */,
+				C1857C4018C40423006B12A6 /* calib3d.h */,
 				C1502E1A18B04D2400CBE2B4 /* calib3d.cpp */,
 				C1502E1B18B04D2400CBE2B4 /* in_camera0.xml */,
 				C1502E1C18B04D2400CBE2B4 /* Makefile */,
@@ -177,6 +181,7 @@
 				C1502E1918B04D1300CBE2B4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

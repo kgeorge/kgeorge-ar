@@ -1,3 +1,7 @@
+#if !defined(SETTINGS_H_)
+#define SETTINGS_H_
+
+
 #include <iostream>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -47,4 +51,4 @@ private:
 };
 
 void operator>>(const FileNode& n, Settings& value);
-
+#endif //SETTINGS_H_
