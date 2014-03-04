@@ -28,31 +28,36 @@ OPENCV-LIBS=\
 GL-EXTRA-INCLUDES = $(shell /usr/local/bin/pkg-config --cflags glew) $(shell /usr/local/bin/pkg-config --cflags glfw3)
 GL-EXTRA-LIBS = $(shell /usr/local/bin/pkg-config --libs glew) $(shell /usr/local/bin/pkg-config --libs glfw3) -F /System/Library/Frameworks  -framework IOKit -framework Cocoa -framework QuartzCore
 
-
+LOCAL-INCLUDES= ./../common
+#LOCAL-LIBS= -L./../common/build/ libKgCommon.a
+#LOCAL-LIBS= -L/Users/kgeorge/Documents/projects/kgeorge-ar/ar-challenge/common/build libKgCommon.a
+LOCAL-LIBS= -L./../common/build -lKgCommon
 
 CXX=clang++
-CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL  $(OPENCV-INCLUDES)  $(GL-EXTRA-INCLUDES)
-LDFLAGS= $(OPENCV-LIBS)  $(GL-EXTRA-LIBS)
+CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL  $(OPENCV-INCLUDES)  $(GL-EXTRA-INCLUDES) $(LOCAl-INCLUDES)
+LDFLAGS= $(OPENCV-LIBS)  $(GL-EXTRA-LIBS) $(LOCAL-LIBS)
 
-OBJS=main.o ogl.o findPattern.o oglBackground.o util.o shaderSupport.o
-PROG=ar
+BUILD-DIR=build
+OBJS=$(addprefix $(BUILD-DIR)/, main.o ogl.o findPattern.o)
+PROG=$(BUILD-DIR)/augrel
 
 #.PHONY: run
 
-#run: ar
-#	./ar
+#run: augrel
+#	./build/augrel
 
 all: $(PROG)
 
+#order-only-prerequisites
+$(OBJS): | $(BUILD-DIR)
 
 $(PROG): $(OBJS)
-	#@echo hihihi $(OPENCV-LIBS-1)
 	$(CXX) -v -o $(PROG) $(OBJS) $(LDFLAGS)
 
-%.o: %.cpp
-	$(CXX) -c $(CXXFLAGS) $<
+$(BUILD-DIR)/%.o: %.cpp
+	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-#ar: ar.cpp
-
+$(BUILD-DIR):
+	mkdir -p $(BUILD-DIR)
 clean:
-	rm $(OBJS); rm ar
+	rm $(OBJS); rm $(PROG)
