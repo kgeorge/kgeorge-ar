@@ -11,7 +11,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include "oglBackground.h"
+#include "kgBackground.h"
 
 
 class OGLDraw;

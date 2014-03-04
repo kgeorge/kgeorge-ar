@@ -28,13 +28,13 @@ OPENCV-LIBS=\
 GL-EXTRA-INCLUDES = $(shell /usr/local/bin/pkg-config --cflags glew) $(shell /usr/local/bin/pkg-config --cflags glfw3)
 GL-EXTRA-LIBS = $(shell /usr/local/bin/pkg-config --libs glew) $(shell /usr/local/bin/pkg-config --libs glfw3) -F /System/Library/Frameworks  -framework IOKit -framework Cocoa -framework QuartzCore
 
-LOCAL-INCLUDES= ./../common
+LOCAL-INCLUDES= -I./../common
 #LOCAL-LIBS= -L./../common/build/ libKgCommon.a
 #LOCAL-LIBS= -L/Users/kgeorge/Documents/projects/kgeorge-ar/ar-challenge/common/build libKgCommon.a
 LOCAL-LIBS= -L./../common/build -lKgCommon
 
 CXX=clang++
-CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL  $(OPENCV-INCLUDES)  $(GL-EXTRA-INCLUDES) $(LOCAl-INCLUDES)
+CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL  $(OPENCV-INCLUDES)  $(GL-EXTRA-INCLUDES) $(LOCAL-INCLUDES)
 LDFLAGS= $(OPENCV-LIBS)  $(GL-EXTRA-LIBS) $(LOCAL-LIBS)
 
 BUILD-DIR=build
