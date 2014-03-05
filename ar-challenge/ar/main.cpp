@@ -11,6 +11,7 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include "ogl.h"
 #include "findPattern.h"
+#include "kgUtil.h"
 
 
 using namespace std;
@@ -40,16 +41,16 @@ int main(int argc, char **argv) {
      glfwSetErrorCallback(error_callback);
     if (!glfwInit())
         exit(EXIT_FAILURE);
-    
+
     glfwSetErrorCallback(error_callback);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-     
 
-    window = glfwCreateWindow(800, 600, "check-opengl", NULL, NULL);
+    window = glfwCreateWindow(400, 300, "check-opengl", NULL, NULL);
+    
     if (!window)
     {
         glfwTerminate();
@@ -85,11 +86,11 @@ int main(int argc, char **argv) {
     
     Mat image;
     RNG rng(12345);
-    int win_width = 800;
-    int win_height = 600;
+    int win_width = 400;
+    int win_height = 300;
     cap >> image;
-    //win_width = image.cols;
-    //win_height = image.rows;
+    win_width = image.cols;
+    win_height = image.rows;
     const string win_name("kgeorge-ar");
     
     OGLDraw oglDraw = OGLDraw(

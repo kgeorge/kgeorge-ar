@@ -34,11 +34,12 @@ LOCAL-INCLUDES= -I./../common
 LOCAL-LIBS= -L./../common/build -lKgCommon
 
 CXX=clang++
-CXXFLAGS=-g -Wall -Wno-deprecated -std=c++11 -D WITH_OPENGL  $(OPENCV-INCLUDES)  $(GL-EXTRA-INCLUDES) $(LOCAL-INCLUDES)
+FORGIVING-CXXFLAGS=-Wno-reorder
+CXXFLAGS=-g -Wall -Wno-deprecated $(FORGIVING-CXXFLAGS) -std=c++11 -D WITH_OPENGL  $(OPENCV-INCLUDES)  $(GL-EXTRA-INCLUDES) $(LOCAL-INCLUDES)
 LDFLAGS= $(OPENCV-LIBS)  $(GL-EXTRA-LIBS) $(LOCAL-LIBS)
 
 BUILD-DIR=build
-OBJS=$(addprefix $(BUILD-DIR)/, main.o ogl.o findPattern.o)
+OBJS=$(addprefix $(BUILD-DIR)/, main.o ogl.o findPattern.o oglScene.o)
 PROG=$(BUILD-DIR)/augrel
 
 #.PHONY: run
@@ -55,6 +56,7 @@ $(PROG): $(OBJS)
 	$(CXX) -v -o $(PROG) $(OBJS) $(LDFLAGS)
 
 $(BUILD-DIR)/%.o: %.cpp
+	@echo compiling with forgiving cxxflags $(FORGIVING-CXXFLAGS)
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 $(BUILD-DIR):

@@ -12,6 +12,7 @@
 #include <GLFW/glfw3.h>
 
 #include "kgBackground.h"
+#include "oglScene.h"
 
 
 class OGLDraw;
@@ -62,6 +63,7 @@ protected:
     std::string winName;
     cv::Size    winSize;
     OGLBackground   background;
+    OGLScene        scene;
     //perframe data from app
 public:
     PerFrameAppData *perFrameAppData;

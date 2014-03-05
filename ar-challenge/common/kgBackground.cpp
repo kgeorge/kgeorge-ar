@@ -190,6 +190,7 @@ void OGLBackground::draw() {
     glUniformMatrix4fv(backgroundViewUniformLocation, 1, GL_FALSE, modelOrView);
 
     //vetex buffer object activation
+    glBindVertexArray(backgroundVertexArray);
     glBindBuffer(GL_ARRAY_BUFFER, backgroundTextureVerticesVBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, backgroundTextureIndicesVBO);
     glEnableVertexAttribArray(backgroundPositionAttributeLocation);

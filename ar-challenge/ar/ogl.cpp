@@ -12,10 +12,40 @@
 #include <iostream>
 #include <math.h>
 #include "ogl.h"
+#include "kgUtil.h"
+
 
 using namespace std;
 using namespace cv;
 
+void convert_from_opencv_4x464F_to_opengl_4x4f(cv::Mat &mat, float openglMat[16]) {
+    auto computeIndex = [](int i, int j) { return (i*4 + j); };
+    assert(mat.type() == CV_64F && mat.size() == Size(4,4));
+    openglMat[computeIndex(0,0)] = mat.at<double>(0,0);
+    openglMat[computeIndex(0,1)] = mat.at<double>(0,1);
+    openglMat[computeIndex(0,2)] = mat.at<double>(0,2);
+    openglMat[computeIndex(0,3)] = mat.at<double>(0,3);
+    
+    
+    
+    openglMat[computeIndex(1,0)] = mat.at<double>(1,0);
+    openglMat[computeIndex(1,1)] = mat.at<double>(1,1);
+    openglMat[computeIndex(1,2)] = mat.at<double>(1,2);
+    openglMat[computeIndex(1,3)] = mat.at<double>(1,3);
+    
+    
+    openglMat[computeIndex(2,0)] = mat.at<double>(2,0);
+    openglMat[computeIndex(2,1)] = mat.at<double>(2,1);
+    openglMat[computeIndex(2,2)] = mat.at<double>(2,2);
+    openglMat[computeIndex(2,3)] = mat.at<double>(2,3);
+    
+    
+    
+    openglMat[computeIndex(3,0)] = mat.at<double>(3,0);
+    openglMat[computeIndex(3,1)] = mat.at<double>(3,1);
+    openglMat[computeIndex(3,2)] = mat.at<double>(3,2);
+    openglMat[computeIndex(3,3)] = mat.at<double>(3,3);
+}
 
 void OGLDrawCallback(void* userdata) {
     OGLDraw *draw = reinterpret_cast<OGLDraw *> (userdata);
@@ -28,6 +58,7 @@ OGLDraw::OGLDraw(
                  PerFrameAppData *perFrameAppData):
 winName(winName),
 winSize(winSize),
+scene(winSize),
 perFrameAppData(perFrameAppData){}
 
 
@@ -36,14 +67,16 @@ OGLDraw::~OGLDraw() {
 
 void OGLDraw::draw() {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT); // Clear entire screen:
+
+
     background.draw();
     if(perFrameAppData->bValidFrame) {
-        _drawAugmentedFrame();
+       _drawAugmentedFrame();
     }
 }
 
 void OGLDraw::cleanup() {
-    
+    scene.cleanup();
     background.cleanup();
     setOpenGlDrawCallback(winName, 0, 0);
     destroyAllWindows();
@@ -134,30 +167,29 @@ void OGLDraw::_drawCoordAxes(const float axisScale) {
     
 }
 void OGLDraw::_drawAugmentedFrame() {
-    cv::Mat frustumMatrix(4, 4, CV_64F, Scalar(0));
+    cv::Mat cvFrustumMatrix(4, 4, CV_64F, Scalar(0));
     double near =0.1, far =100.0, left =-winSize.width/2.0, right =winSize.width/2.0, top=winSize.height/2.0, bottom=-winSize.height/2.0;
     _buildProjectionMatrix(
                            *perFrameAppData,
                            near, far,
                            left, right,
                            bottom, top,
-                           frustumMatrix);
-    cv::Mat glModelMatrix(4,4, CV_64F, 0);
-    cv::Mat glViewMatrix(4,4, CV_64F, 0);
-    _buildModelMatrix(*perFrameAppData, glModelMatrix);
-    _buildViewMatrix(0,0,3,0,0,0,0,1,0, glViewMatrix);
-    Mat rotMat(3,3, CV_32FC1);
-    cv::Rodrigues( perFrameAppData->rvec, rotMat );
+                           cvFrustumMatrix);
+    cv::Mat cvModelMatrix(4,4, CV_64F, 0);
+    cv::Mat cvViewMatrix(4,4, CV_64F, 0);
+    _buildModelMatrix(*perFrameAppData, cvModelMatrix);
+    _buildViewMatrix(0,0,3,0,0,0,0,1,0, cvViewMatrix);
     
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixd(&frustumMatrix.at<double>(0,0));
-    glMatrixMode(GL_MODELVIEW);
-    glMultMatrixd(&glViewMatrix.at<double>(0,0));
-    glLoadMatrixd(&glModelMatrix.at<double>(0, 0));
-    glPushMatrix();
-    glTranslated(-0.5, -0.5, 0);
-    _drawTetrahedron(0.5f);
-    glPopMatrix();
+    
+    assert(!glewGetExtension("GL_ARB_gpu_shader_fp64"));
+    float glFrustumMatrix[16];
+    float glModelMatrix[16];
+    float glViewMatrix[16];
+    convert_from_opencv_4x464F_to_opengl_4x4f(cvFrustumMatrix, glFrustumMatrix );
+    convert_from_opencv_4x464F_to_opengl_4x4f(cvModelMatrix, glModelMatrix );
+    convert_from_opencv_4x464F_to_opengl_4x4f(cvViewMatrix, glViewMatrix );
+    
+    scene.drawAugmentedFrame( glModelMatrix, glViewMatrix, glFrustumMatrix );
 }
 
 //http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
