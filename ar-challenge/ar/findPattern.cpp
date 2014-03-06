@@ -5,23 +5,13 @@
 #include <opencv2/calib3d/calib3d.hpp>
 #include <iostream>
 #include "findPattern.h"
+#include "kgUtil.h"
 #include "ogl.h"
 
 
 
 using namespace std;
 using namespace cv;
-
-
-
-double angle(const Point &p0, const Point &p1, const Point &p2 ) {    double dx0 = p0.x - p1.x;
-    double dx2 = p2.x - p1.x;
-    double dy0 = p0.y - p1.y;
-    double dy2 = p2.y - p1.y;
-    double num = dx0 * dx2 + dy0 * dy2;
-    double denom = sqrt((dx0 * dx0 + dy0  * dy0) * (dx2 * dx2 + dy2 * dy2) + 1.0e-10);
-    return num/denom;
-}
 
 
 

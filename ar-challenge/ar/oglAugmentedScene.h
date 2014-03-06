@@ -13,7 +13,7 @@
 
 
 
-class OGLScene {
+class OGLAugmentedScene {
 public:
 
     typedef struct {
@@ -21,8 +21,8 @@ public:
         float color[4];
     } GeometryVertex;
 
-    OGLScene(const cv::Size &winSize);
-    ~OGLScene();
+    OGLAugmentedScene(const cv::Size &winSize);
+    ~OGLAugmentedScene();
     void        cleanup();
     void    drawAugmentedFrame(
         float glModelMatrix[16],

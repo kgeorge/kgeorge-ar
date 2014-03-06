@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "oglScene.h"
+#include "oglAugmentedScene.h"
 #include "kgShaderSupport.h"
 
 using namespace std;
@@ -44,7 +44,7 @@ static const char * geometry_fs_source[] = {
 };
 
 
-OGLScene::OGLScene(
+OGLAugmentedScene::OGLAugmentedScene(
                  const cv::Size &winSize):
     bGeometryInitialized(false),
     winSize(winSize),
@@ -60,10 +60,10 @@ OGLScene::OGLScene(
     {}
 
 
-OGLScene::~OGLScene() {
+OGLAugmentedScene::~OGLAugmentedScene() {
 }
 
-void OGLScene::cleanup() {
+void OGLAugmentedScene::cleanup() {
      if(bGeometryInitialized) {
         _cleanupGLObjects();
         bGeometryInitialized = false;
@@ -71,7 +71,7 @@ void OGLScene::cleanup() {
 }
 
 
-void OGLScene::_initGeometry(float scale) {
+void OGLAugmentedScene::_initGeometry(float scale) {
     assert(!bGeometryInitialized);
 
     const double ac = scale * cos(30*M_PI/180.0);
@@ -148,7 +148,7 @@ void OGLScene::_initGeometry(float scale) {
 }
 
 
-void OGLScene::_initGLObjects() {
+void OGLAugmentedScene::_initGLObjects() {
     assert(!bGeometryInitialized);
 
 
@@ -171,11 +171,11 @@ void OGLScene::_initGLObjects() {
 
 
 
-void OGLScene::_setupShaders() {
+void OGLAugmentedScene::_setupShaders() {
     geometryShaderProgramId = ShaderSupport::makeShaderProgramFromText( geometry_vs_source,  geometry_fs_source );
 }
 
-void OGLScene::initIfNeeded() {
+void OGLAugmentedScene::initIfNeeded() {
     if(!bGeometryInitialized) {
         _initGeometry(0.5f);
         _initGLObjects();
@@ -184,13 +184,13 @@ void OGLScene::initIfNeeded() {
 
 }
 
-void OGLScene::_cleanupShaders() {
+void OGLAugmentedScene::_cleanupShaders() {
     ShaderSupport::cleanupShaderProgram( geometryShaderProgramId );
     geometryShaderProgramId = -1;
 }
 
 
-void OGLScene::_getUniformAndAttributeLocations() {
+void OGLAugmentedScene::_getUniformAndAttributeLocations() {
     geometryModelUniformLocation = glGetUniformLocation(geometryShaderProgramId, "model");
     validate(geometryModelUniformLocation >= 0, string("cant find uniform location: ") + string("model"));
 
@@ -212,7 +212,7 @@ void OGLScene::_getUniformAndAttributeLocations() {
 
 }
 
-void OGLScene::_cleanupGLObjects() {
+void OGLAugmentedScene::_cleanupGLObjects() {
     glDeleteBuffers(1, &geometryIndicesVBO);
     glDeleteBuffers(1, &geometryVerticesVBO);
     glDeleteVertexArrays(1, &geometryVertexArray);
@@ -225,7 +225,7 @@ void OGLScene::_cleanupGLObjects() {
 
 
 
-void OGLScene::_drawCoordAxes(const float axisScale) {
+void OGLAugmentedScene::_drawCoordAxes(const float axisScale) {
     float lineX[] = {0,0,0,axisScale,0,0};
     float lineY[] = {0,0,0,0,axisScale,0};
     float lineZ[] = {0,0,0,0,0,axisScale};
@@ -251,7 +251,7 @@ void OGLScene::_drawCoordAxes(const float axisScale) {
     glEnd();
     
 }
-void OGLScene::drawAugmentedFrame(
+void OGLAugmentedScene::drawAugmentedFrame(
         float glModelMatrix[16],
         float glViewMatrix[16],
         float glProjectionMatrix[16]) {

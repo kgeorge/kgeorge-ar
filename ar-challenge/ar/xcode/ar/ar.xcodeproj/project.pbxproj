@@ -14,16 +14,16 @@
 		C1B9A56118B051F0005F0259 /* ogl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ogl.cpp; path = ../../ogl.cpp; sourceTree = "<group>"; };
 		C1B9A56218B051F0005F0259 /* ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ogl.h; path = ../../ogl.h; sourceTree = "<group>"; };
 		C1B9A56318B051F0005F0259 /* out_camera_data.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = out_camera_data.xml; path = ../../out_camera_data.xml; sourceTree = "<group>"; };
-		C1DDC3DA18C639FC005783E2 /* oglScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oglScene.cpp; path = ../../oglScene.cpp; sourceTree = "<group>"; };
-		C1DDC3DB18C639FC005783E2 /* oglScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = oglScene.h; path = ../../oglScene.h; sourceTree = "<group>"; };
+		C1BD823918C8E23900E7C8EB /* oglAugmentedScene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = oglAugmentedScene.cpp; path = ../../oglAugmentedScene.cpp; sourceTree = "<group>"; };
+		C1BD823A18C8E23900E7C8EB /* oglAugmentedScene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = oglAugmentedScene.h; path = ../../oglAugmentedScene.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		C1B9A55518B051DA005F0259 = {
 			isa = PBXGroup;
 			children = (
-				C1DDC3DA18C639FC005783E2 /* oglScene.cpp */,
-				C1DDC3DB18C639FC005783E2 /* oglScene.h */,
+				C1BD823918C8E23900E7C8EB /* oglAugmentedScene.cpp */,
+				C1BD823A18C8E23900E7C8EB /* oglAugmentedScene.h */,
 				C179CFC818BFE169002F4B46 /* main.cpp */,
 				C136517618B45B2A0051DB07 /* findPattern.cpp */,
 				C136517718B45B2A0051DB07 /* findPattern.h */,

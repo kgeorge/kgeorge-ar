@@ -58,7 +58,7 @@ OGLDraw::OGLDraw(
                  PerFrameAppData *perFrameAppData):
 winName(winName),
 winSize(winSize),
-scene(winSize),
+augmentedScene(winSize),
 perFrameAppData(perFrameAppData){}
 
 
@@ -76,7 +76,7 @@ void OGLDraw::draw() {
 }
 
 void OGLDraw::cleanup() {
-    scene.cleanup();
+    augmentedScene.cleanup();
     background.cleanup();
     setOpenGlDrawCallback(winName, 0, 0);
     destroyAllWindows();
@@ -187,7 +187,7 @@ void OGLDraw::_drawAugmentedFrame() {
     convert_from_opencv_4x464F_to_opengl_4x4f(cvModelMatrix, glModelMatrix );
     convert_from_opencv_4x464F_to_opengl_4x4f(cvViewMatrix, glViewMatrix );
     
-    scene.drawAugmentedFrame( glModelMatrix, glViewMatrix, glFrustumMatrix );
+    augmentedScene.drawAugmentedFrame( glModelMatrix, glViewMatrix, glFrustumMatrix );
 }
 
 //http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
