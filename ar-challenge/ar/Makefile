@@ -39,7 +39,7 @@ CXXFLAGS=-g -Wall -Wno-deprecated $(FORGIVING-CXXFLAGS) -std=c++11 -D WITH_OPENG
 LDFLAGS= $(OPENCV-LIBS)  $(GL-EXTRA-LIBS) $(LOCAL-LIBS)
 
 BUILD-DIR=build
-OBJS=$(addprefix $(BUILD-DIR)/, main.o ogl.o findPattern.o oglAugmentedScene.o)
+OBJS=$(addprefix $(BUILD-DIR)/, main.o oglMain.o findPattern.o oglAugmentedScene.o)
 PROG=$(BUILD-DIR)/augrel
 
 #.PHONY: run

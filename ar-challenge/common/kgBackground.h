@@ -11,7 +11,6 @@
 #define GLFW_NO_GLU       /* don't drag in the old GLU lib - unless you must. */
 
 #include <GLFW/glfw3.h>
-class OGLDraw;
 
 
 class OGLBackground {

@@ -9,7 +9,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
-#include "ogl.h"
+#include "oglMain.h"
 #include "findPattern.h"
 #include "kgUtil.h"
 
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
 
     const string win_name("kgeorge-ar");
     
-    OGLDraw oglDraw = OGLDraw(
+    OGLMain oglMain = OGLMain(
                               Size(win_width, win_height),
                               win_name,
                               &perFrameAppData);
@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
         
         
         
-        oglDraw.processFrame( image );
+        oglMain.processFrame( image );
         
         
         glfwSwapBuffers(window);

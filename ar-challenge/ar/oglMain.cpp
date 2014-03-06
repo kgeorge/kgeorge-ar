@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "ogl.h"
+#include "oglMain.h"
 #include "kgUtil.h"
 
 
@@ -47,12 +47,12 @@ void convert_from_opencv_4x464F_to_opengl_4x4f(cv::Mat &mat, float openglMat[16]
     openglMat[computeIndex(3,3)] = mat.at<double>(3,3);
 }
 
-void OGLDrawCallback(void* userdata) {
-    OGLDraw *draw = reinterpret_cast<OGLDraw *> (userdata);
+void OGLMainCallback(void* userdata) {
+    OGLMain *draw = reinterpret_cast<OGLMain *> (userdata);
     draw->draw();
 }
 
-OGLDraw::OGLDraw(
+OGLMain::OGLMain(
                  const cv::Size &winSize,
                  const std::string &winName,
                  PerFrameAppData *perFrameAppData):
@@ -62,10 +62,10 @@ augmentedScene(perFrameAppData->squareSize),
 perFrameAppData(perFrameAppData){}
 
 
-OGLDraw::~OGLDraw() {
+OGLMain::~OGLMain() {
 }
 
-void OGLDraw::draw() {
+void OGLMain::draw() {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT); // Clear entire screen:
 
 
@@ -75,98 +75,19 @@ void OGLDraw::draw() {
     }
 }
 
-void OGLDraw::cleanup() {
+void OGLMain::cleanup() {
     augmentedScene.cleanup();
     background.cleanup();
     setOpenGlDrawCallback(winName, 0, 0);
     destroyAllWindows();
 }
 
-void OGLDraw::processFrame( Mat &frame) {
+void OGLMain::processFrame( Mat &frame) {
     background.processFrame(frame);
     draw();
 }
 
-
-
-void OGLDraw::_drawTetrahedron(const float axisScale) {
-    const double ac = axisScale * cos(30*M_PI/180.0);
-    const double as = axisScale * sin(30*M_PI/180.0);
-    const double height = axisScale *sqrt(2.0/3.0);
-    
-    double A[] = {0,axisScale,0};
-    double B[] = {ac, as, 0};
-    double C[] = {-ac, -as, 0};
-    double  D[] = {0,0, -height};
-    
-    glLineWidth(4);
-    glBegin(GL_LINES);
-    
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex3dv(A);
-    glVertex3dv(B);
-    
-    
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex3dv(B);
-    glVertex3dv(C);
-    
-    
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex3dv(C);
-    glVertex3dv(A);
-    
-    
-    glColor3f(1.0f, 1.0f, 0.0f);
-    glVertex3dv(A);
-    glVertex3dv(D);
-    
-    
-    glColor3f(0.0f, 1.0f, 1.0f);
-    glVertex3dv(B);
-    glVertex3dv(D);
-    
-    
-    glColor3f(1.0f, 0.0f, 1.0f);
-    glVertex3dv(C);
-    glVertex3dv(D);
-    
-    
-    
-    
-    glEnd();
-    
-}
-
-
-
-void OGLDraw::_drawCoordAxes(const float axisScale) {
-    float lineX[] = {0,0,0,axisScale,0,0};
-    float lineY[] = {0,0,0,0,axisScale,0};
-    float lineZ[] = {0,0,0,0,0,axisScale};
-    
-    glLineWidth(2);
-    glBegin(GL_LINES);
-    
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glVertex3fv(lineX);
-    glVertex3fv(lineX + 3);
-    
-    
-    glColor3f(0.0f, 1.0f, 0.0f);
-    glVertex3fv(lineY);
-    glVertex3fv(lineY + 3);
-    
-    
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glVertex3fv(lineZ);
-    glVertex3fv(lineZ + 3);
-    
-    
-    glEnd();
-    
-}
-void OGLDraw::_drawAugmentedFrame() {
+void OGLMain::_drawAugmentedFrame() {
     cv::Mat cvFrustumMatrix(4, 4, CV_64F, Scalar(0));
     double near =0.1, far =100.0;
     _buildProjectionMatrix(
@@ -191,7 +112,7 @@ void OGLDraw::_drawAugmentedFrame() {
 }
 
 //http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
-void OGLDraw::_buildProjectionMatrix(
+void OGLMain::_buildProjectionMatrix(
                                      const  PerFrameAppData &perFrameAppData,
                                      double near, double far,
                                      cv::Mat &frustumMatrix) {
@@ -221,7 +142,7 @@ void OGLDraw::_buildProjectionMatrix(
     cv::transpose(tempFrustumMatrix, frustumMatrix);
 }
 
-void OGLDraw::_buildModelMatrix(const PerFrameAppData &perFrameAppData, cv::Mat &glModelMatrix)
+void OGLMain::_buildModelMatrix(const PerFrameAppData &perFrameAppData, cv::Mat &glModelMatrix)
 {
     cv::Mat rvec(perFrameAppData.rvec);
     cv::Mat tvec(perFrameAppData.tvec);
@@ -253,7 +174,7 @@ void cross (const cv::Vec<double,3> &a, const cv::Vec<double, 3> &b, cv::Vec<dou
     out[2] = ax*by - ay*bz;
 }
 
-void OGLDraw::_buildViewMatrix( cv::Mat &glViewMatrix) {
+void OGLMain::_buildViewMatrix( cv::Mat &glViewMatrix) {
     Mat tempViewMatrix(4, 4, CV_64F, Scalar(0));
     tempViewMatrix.at<double>(0,0) = 1.0;
     tempViewMatrix.at<double>(1,1) = 1.0;
@@ -264,6 +185,3 @@ void OGLDraw::_buildViewMatrix( cv::Mat &glViewMatrix) {
     cv::transpose(tempViewMatrixInv, glViewMatrix);
 }
 
-void OGLDraw::updateWindow() {
-    cv::updateWindow(winName);
-}

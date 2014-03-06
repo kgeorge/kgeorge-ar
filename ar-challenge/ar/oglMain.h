@@ -15,7 +15,7 @@
 #include "oglAugmentedScene.h"
 
 
-class OGLDraw;
+class OGLMain;
 
 struct PerFrameAppData {
     bool bValidFrame;
@@ -26,26 +26,23 @@ struct PerFrameAppData {
     float squareSize;
 } ;
 
-class OGLDraw {
+class OGLMain {
 public:
-    OGLDraw(const cv::Size &winSize, const std::string &winName, PerFrameAppData *perFrameAppData);
-    ~OGLDraw();
+    OGLMain(const cv::Size &winSize, const std::string &winName, PerFrameAppData *perFrameAppData);
+    ~OGLMain();
     void        cleanup();
-    void        updateWindow();
     void        processFrame(cv::Mat & mat);
     void        draw();
     
 protected:
     void    _drawCameraFrame();
     void    _drawAugmentedFrame();
-    void    _drawCoordAxes(const float axisScale);
     void    _buildProjectionMatrix(
                                    const PerFrameAppData &perFrameAppData,
                                    double near, double far,
                                    cv::Mat &frustumMatrix);
     void    _buildModelMatrix(const PerFrameAppData &perFrameAppData, cv::Mat &glViewMatrix);
-    void _drawTetrahedron(const float axisScale) ;
-    void _buildViewMatrix(cv::Mat &glModelMatrix);
+    void    _buildViewMatrix(cv::Mat &glModelMatrix);
     
     
     std::string winName;

@@ -6,7 +6,7 @@
 #include <iostream>
 #include "findPattern.h"
 #include "kgUtil.h"
-#include "ogl.h"
+#include "oglMain.h"
 
 
 
