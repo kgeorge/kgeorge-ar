@@ -124,23 +124,12 @@ void findPattern(
     
     if( adjustedContour.size() > 0) {
         perFrameAppData.bValidFrame = true;
-        float side =perFrameAppData.squareSize;
+        float side = 3 * perFrameAppData.squareSize;
         vector<Point3f> objectPoints;
-        if(isCounterClockwise) {
-            
-            objectPoints.push_back( Point3f(-side, -side, 0) );
-            objectPoints.push_back( Point3f(side, -side, 0) );
-            objectPoints.push_back( Point3f(side, side, 0) );
-            objectPoints.push_back( Point3f(-side, side, 0) );
-            
-        } else {
-            
-            objectPoints.push_back( Point3f(-side, -side, 0) );
-            objectPoints.push_back( Point3f(-side, side, 0) );
-            objectPoints.push_back( Point3f(side, side, 0) );
-            objectPoints.push_back( Point3f(side, -side, 0) );
-            
-        };
+        objectPoints.push_back( Point3f(-side, -side, 0) );
+        objectPoints.push_back( Point3f(side, -side, 0) );
+        objectPoints.push_back( Point3f(side, side, 0) );
+        objectPoints.push_back( Point3f(-side, side, 0) );
         Mat rotMat(3,3, CV_32FC1);
         Mat objectPointsMat(objectPoints);
         cout << "objectPointsMat " << objectPointsMat.rows << " x " << objectPointsMat.cols;

@@ -49,7 +49,22 @@ int main(int argc, char **argv) {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    window = glfwCreateWindow(400, 300, "check-opengl", NULL, NULL);
+
+
+    VideoCapture cap(0);
+    if(!cap.isOpened())  // check if we succeeded
+        return -1;
+
+
+    Mat image;
+    RNG rng(12345);
+    int win_width = 640;
+    int win_height = 360;
+    cap >> image;
+    win_width = image.cols;
+    win_height = image.rows;
+
+    window = glfwCreateWindow(win_width, win_height, "check-opengl", NULL, NULL);
     
     if (!window)
     {
@@ -69,10 +84,7 @@ int main(int argc, char **argv) {
     cout << "GL_VERSION:" << strGLVersion << endl;
     const GLubyte * strGLShadingLanguageVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
     cout << "GL_VERSION:" << strGLShadingLanguageVersion << endl;
-    
-    VideoCapture cap(0);
-    if(!cap.isOpened())  // check if we succeeded
-        return -1;
+
     
     PerFrameAppData perFrameAppData;
     FileStorage fs("out_camera_data.xml", FileStorage::READ );
@@ -83,14 +95,7 @@ int main(int argc, char **argv) {
     
     cout << "intrinsics" << perFrameAppData.intrinsics << endl;
     cout << "distortion coefficients" << perFrameAppData.distortion << endl;
-    
-    Mat image;
-    RNG rng(12345);
-    int win_width = 400;
-    int win_height = 300;
-    cap >> image;
-    win_width = image.cols;
-    win_height = image.rows;
+
     const string win_name("kgeorge-ar");
     
     OGLDraw oglDraw = OGLDraw(

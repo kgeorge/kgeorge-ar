@@ -27,7 +27,7 @@ static const char * geometry_vs_source[] = {
 "uniform mat4 view;\n",
 "smooth out vec4 vColor;\n",
 "void main(void){\n",
-"    gl_Position = projection * view * model  * vec4(position.xyz,  1.0);\n",
+"    gl_Position = projection * view * model  * vec4(position.xyz,  0.6);\n",
 "    vColor = color;\n",
 "}\n"
 };

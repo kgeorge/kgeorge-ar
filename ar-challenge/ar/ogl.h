@@ -42,22 +42,10 @@ protected:
     void    _buildProjectionMatrix(
                                    const PerFrameAppData &perFrameAppData,
                                    double near, double far,
-                                   double left, double right,
-                                   double bottom, double top,
                                    cv::Mat &frustumMatrix);
     void    _buildModelMatrix(const PerFrameAppData &perFrameAppData, cv::Mat &glViewMatrix);
     void _drawTetrahedron(const float axisScale) ;
-    void _buildViewMatrix(
-                          double ex,
-                          double ey,
-                          double ez,
-                          double lx,
-                          double ly,
-                          double lz,
-                          double ux,
-                          double uy,
-                          double uz,
-                          cv::Mat &glModelMatrix);
+    void _buildViewMatrix(cv::Mat &glModelMatrix);
     
     
     std::string winName;

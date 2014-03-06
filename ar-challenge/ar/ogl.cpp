@@ -168,17 +168,15 @@ void OGLDraw::_drawCoordAxes(const float axisScale) {
 }
 void OGLDraw::_drawAugmentedFrame() {
     cv::Mat cvFrustumMatrix(4, 4, CV_64F, Scalar(0));
-    double near =0.1, far =100.0, left =-winSize.width/2.0, right =winSize.width/2.0, top=winSize.height/2.0, bottom=-winSize.height/2.0;
+    double near =0.1, far =100.0;
     _buildProjectionMatrix(
                            *perFrameAppData,
                            near, far,
-                           left, right,
-                           bottom, top,
                            cvFrustumMatrix);
     cv::Mat cvModelMatrix(4,4, CV_64F, 0);
     cv::Mat cvViewMatrix(4,4, CV_64F, 0);
     _buildModelMatrix(*perFrameAppData, cvModelMatrix);
-    _buildViewMatrix(0,0,3,0,0,0,0,1,0, cvViewMatrix);
+    _buildViewMatrix(cvViewMatrix);
     
     
     assert(!glewGetExtension("GL_ARB_gpu_shader_fp64"));
@@ -196,34 +194,30 @@ void OGLDraw::_drawAugmentedFrame() {
 void OGLDraw::_buildProjectionMatrix(
                                      const  PerFrameAppData &perFrameAppData,
                                      double near, double far,
-                                     double left, double right,
-                                     double bottom, double top,
                                      cv::Mat &frustumMatrix) {
     Mat tempFrustumMatrix(4, 4, CV_64F, Scalar(0));
     double alpha = perFrameAppData.intrinsics.at<double>(0,0);
     double beta = perFrameAppData.intrinsics.at<double>(1,1);
     double x0 = perFrameAppData.intrinsics.at<double>(0,2);
     double y0 = perFrameAppData.intrinsics.at<double>(1,2);
-    x0=0.0;
-    y0=0.0;
     CV_Assert( alpha > 0 );
     CV_Assert( beta >  0 );
-    CV_Assert( right > left  );
-    CV_Assert( top > bottom  );
     CV_Assert( far > near  );
     
-    double left_modified = (near/alpha) * left -  x0;
-    double right_modified = (near/alpha) * right - x0;
-    double bottom_modified = (near/beta) * bottom - y0;
-    double top_modified = (near/beta) * top  - y0;
+    double left_modified = -(near/alpha) * x0;
+    double right_modified =  (near/alpha) * x0;
+    double bottom_modified = -(near/beta) * y0;
+    double top_modified = (near/beta) * y0;
+    //cout << endl << "left modified: " << left_modified << "  bottom modified " << bottom_modified << endl;
     
-    tempFrustumMatrix.at<double>(0,0) = 2.0 * near /( right_modified - left_modified );
-    tempFrustumMatrix.at<double>(0,2) = (right_modified + left_modified ) / (right_modified - left_modified);
-    tempFrustumMatrix.at<double>(1,1) = 2.0 * near / (top_modified - bottom_modified);
-    tempFrustumMatrix.at<double>(1,2) = (top_modified + bottom_modified) / (top_modified - bottom_modified);
-    tempFrustumMatrix.at<double>(2,2) = -(far + near)/ (far - near);
-    tempFrustumMatrix.at<double>(2,3) = -2.0 * far * near / (far - near);
+    tempFrustumMatrix.at<double>(0,0) = 2.0  * near /( right_modified - left_modified );
+    tempFrustumMatrix.at<double>(0,2) = (right_modified + left_modified) /( right_modified - left_modified );
+    tempFrustumMatrix.at<double>(1,1) = 2.0 * near  / (top_modified - bottom_modified);
+    tempFrustumMatrix.at<double>(1,2) = (top_modified + bottom_modified)/  (top_modified - bottom_modified);
+    tempFrustumMatrix.at<double>(2,2) = -(far + near) / (far - near);
+    tempFrustumMatrix.at<double>(2,3) = -2 * far * near / (far - near);
     tempFrustumMatrix.at<double>(3,2) = -1.0;
+    //cout << "frsutum mtrix: " << tempFrustumMatrix << endl;
     cv::transpose(tempFrustumMatrix, frustumMatrix);
 }
 
@@ -259,54 +253,14 @@ void cross (const cv::Vec<double,3> &a, const cv::Vec<double, 3> &b, cv::Vec<dou
     out[2] = ax*by - ay*bz;
 }
 
-void OGLDraw::_buildViewMatrix(
-                               double ex,
-                               double ey,
-                               double ez,
-                               double lx,
-                               double ly,
-                               double lz,
-                               double ux,
-                               double uy,
-                               double uz,
-                               cv::Mat &glViewMatrix) {
-    
-    cv::Mat tempViewMatrix(4,4,CV_64F, Scalar(0));
-    cv::Vec<double, 3> eye;
-    eye[0] = ex; eye[1] = ey; eye[2] = ez;
-    cv::Vec<double, 3> look;
-    look[0] = lx; look[1] = ly; look[2] = lz;
-    cv::Vec<double, 3> up(3, 1, CV_64F);
-    up[0] = ux; up[1] = uy; up[2] = uz;
-    cv::Vec<double, 3> backward = eye - look;
-    backward *= 1.0/(norm(backward) + 0.000001);
-    cv::Vec<double, 3> right;
-    cross(up, backward, right);
-    right *= 1.0/(norm(right) + 0.000001);
-    cv::Vec<double, 3> yup;
-    cross(backward, right, yup);
-    yup *= 1.0/(norm(yup) + 0.000001);
-    
-    tempViewMatrix.at<double>(0,0) = right[0];
-    tempViewMatrix.at<double>(0,1) = yup[0];
-    tempViewMatrix.at<double>(0,2) = backward[0];
-    tempViewMatrix.at<double>(0,3) = ex;
-    tempViewMatrix.at<double>(1,0) = right[1];
-    tempViewMatrix.at<double>(1,1) = yup[1];
-    tempViewMatrix.at<double>(1,2) = backward[1];
-    tempViewMatrix.at<double>(1,3) = ey;
-    tempViewMatrix.at<double>(2,0) = right[2];
-    tempViewMatrix.at<double>(2,1) = yup[2];
-    tempViewMatrix.at<double>(2,2) = backward[2];
-    tempViewMatrix.at<double>(2,3) = ez;
-    
-    tempViewMatrix.at<double>(3,0) = 0;
-    tempViewMatrix.at<double>(3,1) = 0;
-    tempViewMatrix.at<double>(3,2) = 0;
+void OGLDraw::_buildViewMatrix( cv::Mat &glViewMatrix) {
+    Mat tempViewMatrix(4, 4, CV_64F, Scalar(0));
+    tempViewMatrix.at<double>(0,0) = 1.0;
+    tempViewMatrix.at<double>(1,1) = 1.0;
+    tempViewMatrix.at<double>(2,2) = 1.0;
     tempViewMatrix.at<double>(3,3) = 1.0;
     
     cv::Mat tempViewMatrixInv = tempViewMatrix.inv();
-    
     cv::transpose(tempViewMatrixInv, glViewMatrix);
 }
 

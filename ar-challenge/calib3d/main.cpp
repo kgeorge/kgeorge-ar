@@ -75,7 +75,11 @@ int main( int argc, char *argv[] ) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 
-    window = glfwCreateWindow(800, 600, "check-opengl", NULL, NULL);
+    cv::Mat firstImage = ps->nextImage();
+    int win_width = firstImage.cols;
+    int win_height = firstImage.rows;
+    cout << "creating a window of : " << win_width << " x " << win_height << endl;
+    window = glfwCreateWindow(win_width, win_height, "check-opengl", NULL, NULL);
     if (!window)
     {
         glfwTerminate();

@@ -18,12 +18,14 @@ static void calcBoardCornerPositions(
                                      )
 {
     corners.clear();
+    float halfW = boardSize.width * squareSize;
+    float halfH = boardSize.height * squareSize;
     switch(patternType) {
             case Settings::CHESSBOARD:
             case Settings::CIRCLES_GRID:
                 for( int i=0; i < boardSize.height; ++i) {
                     for( int j=0; j < boardSize.width; ++j) {
-                        corners.push_back ( Point3f(j*squareSize, i*squareSize, 0.0) );
+                        corners.push_back ( Point3f((j*squareSize - halfW), i*squareSize - halfH, 0.0) );
                     }
                 }
                 break;
@@ -337,117 +339,3 @@ void Calib3d::processFrame() {
     background.draw();
     
 }
-
-#if 0
-
-int main( int argc, char *argv[] ) {
-    Mat  cameraMatrix, distCoeffs;
-    Size imageSize;
-    Settings s;
-    const string inputSettingsFile = argc > 1 ? argv[1] : "default.xml";
-    FileStorage fs(inputSettingsFile, FileStorage::READ);
-    if( !fs.isOpened() ) {
-        cout << "Could not open the config file: \"" << inputSettingsFile << "\"" << endl;
-        return -1;
-        
-    }
-    namedWindow("calibrate", WINDOW_OPENGL);
-    resizeWindow("calibrate", 400, 300);
-    
-    fs["Settings"] >> s;
-    fs.release();
-    if(!s.goodInput) {
-        cout << "Invalid input detected: Applicationnstopping " << endl;
-        return -1;
-    }
-    vector<vector<Point2f> > imagePoints;
-    clock_t prevTimestamp = 0;
-    int mode =  s.inputType == Settings::IMAGE_LIST ? CAPTURING : DETECTION;
-    const char ESC_KEY = 27;
-    const Scalar RED(0,0,255), GREEN(0,255,0);
-
-    for(;;) {
-        Mat view = s.nextImage();
-        
-        if( mode == CAPTURING && imagePoints.size() >= (unsigned)s.nrFrames )
-        {
-            if( runCalibrationAndSave(s, view.size(), imagePoints, cameraMatrix, distCoeffs))
-                mode = CALIBRATED;
-            else
-                mode = DETECTION;
-        }
-        
-        Mat red_image(100,100,CV_8UC3, Scalar(0.0, 255.0, 0.0));
-        imageSize = view.size();  // Format input image.
-        
-        if( s.flipVertical )    flip( view, view, 0 );
-        
-        vector<Point2f> pointBuf;
-        
-        bool found;
-        switch( s.calibrationPattern ) // Find feature points on the input format
-        {
-            case Settings::CHESSBOARD:
-                found = findChessboardCorners( view, s.boardSize, pointBuf,
-                                              CV_CALIB_CB_ADAPTIVE_THRESH | CV_CALIB_CB_FAST_CHECK | CV_CALIB_CB_NORMALIZE_IMAGE);
-                break;
-            case Settings::CIRCLES_GRID:
-                found = findCirclesGrid( view, s.boardSize, pointBuf );
-                break;
-            case Settings::ASYMMETRIC_CIRCLES_GRID:
-                found = findCirclesGrid( view, s.boardSize, pointBuf, CALIB_CB_ASYMMETRIC_GRID );
-                break;
-            default:
-                found = false;
-                break;
-        }
-        if(found) {
-            if( s.calibrationPattern == Settings::CHESSBOARD) {
-                Mat viewGray;
-                cvtColor( view, viewGray, CV_BGR2GRAY );
-                cornerSubPix(
-                             viewGray,
-                             pointBuf,
-                             Size(11,11),
-                             Size(-1,-1),
-                             TermCriteria( CV_TERMCRIT_EPS+CV_TERMCRIT_ITER, 30, 0.1 )
-                             );
-                
-                
-            }
-            if( mode == CAPTURING &&
-                (!s.inputCapture.isOpened()||  clock() - prevTimestamp > s.delay*1e-3*CLOCKS_PER_SEC )
-               ) {
-                imagePoints.push_back(pointBuf);
-                prevTimestamp = clock();
-            }
-            drawChessboardCorners( view, s.boardSize, pointBuf, found );
-        }
-        
-        string msg = (mode == CAPTURING) ? "100/100" : mode == CALIBRATED ? "Calibrated" : "Press 'g' to start";
-        int baseLine = 0;
-        Size textSize = getTextSize(msg, 1, 1, 1, &baseLine);
-        Point textOrigin(view.cols - 2*textSize.width - 10, view.rows - 2*baseLine - 10);
-        if( mode == CAPTURING )
-        {
-            msg = format( "%d/%d", (int)imagePoints.size(), s.nrFrames );
-        }
-        //putText( view, msg, textOrigin, 1, 1, mode == CALIBRATED ?  GREEN : RED);
-        
-        
-        imshow("calibrate", view);
-        
-        //key behavior
-        char key = (char)waitKey(s.inputCapture.isOpened() ? 50 : s.delay);
-        if (key == ESC_KEY ) {
-            break;
-        }
-        if( s.inputCapture.isOpened() && key == 'g' )
-        {
-            mode = CAPTURING;
-            imagePoints.clear();
-        }
-    }
-     
-}
-#endif
