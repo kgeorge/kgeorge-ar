@@ -58,7 +58,7 @@ OGLDraw::OGLDraw(
                  PerFrameAppData *perFrameAppData):
 winName(winName),
 winSize(winSize),
-augmentedScene(winSize),
+augmentedScene(perFrameAppData->squareSize),
 perFrameAppData(perFrameAppData){}
 
 

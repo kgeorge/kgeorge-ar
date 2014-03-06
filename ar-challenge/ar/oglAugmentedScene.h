@@ -19,9 +19,9 @@ public:
     typedef struct {
         float location[4];
         float color[4];
-    } GeometryVertex;
+    } AugmentedSceneVertex;
 
-    OGLAugmentedScene(const cv::Size &winSize);
+    OGLAugmentedScene(float squareSize);
     ~OGLAugmentedScene();
     void        cleanup();
     void    drawAugmentedFrame(
@@ -32,6 +32,7 @@ public:
     void initIfNeeded();
 
 protected:
+    //private member funs
     void    _drawCoordAxes(const float axisScale);
 
     void _initGeometry(float scale);
@@ -40,25 +41,27 @@ protected:
     void _setupShaders();
     void _cleanupShaders();
     void _getUniformAndAttributeLocations();
-    cv::Size    winSize;
-
-    bool            bGeometryInitialized;
-    GeometryVertex  geometryVerts[4];
-    GLubyte         geometryIndices[12];
 
 
-    GLuint          geometryVertexArray;
-    GLuint          geometryVerticesVBO;
-    GLuint          geometryIndicesVBO;
+protected:
+    //member vars
+    float squareSize;
+    bool            bAugmentedSceneIntialized;
+    AugmentedSceneVertex  augmentedSceneVertices[4];
+    GLubyte         augmentedSceneIndices[12];
 
 
-    GLuint  geometryShaderProgramId;
+    GLuint          augmentedSceneVertexArray;
+    GLuint          augmentedSceneVerticesVBO;
+    GLuint          augmentedSceneIndicesVBO;
 
-    GLint geometryPositionAttributeLocation;
-    GLint geometryColorAttributeLocation;
-    GLint geometryModelUniformLocation;
-    GLint geometryViewUniformLocation;
-    GLint geometryProjectionUniformLocation;
+
+    GLuint  augmentedSceneProgramId;
+    GLint augmentedScenePositionAttributeLocation;
+    GLint augmentedSceneColorAttributeLocation;
+    GLint augmentedSceneModelUniformLocation;
+    GLint augmentedSceneViewUniformLocation;
+    GLint augmentedSceneProjectionUniformLocation;
 
 
 
