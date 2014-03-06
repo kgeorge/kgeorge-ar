@@ -1,4 +1,4 @@
-#include "settings.hpp"
+#include "settings.h"
 
 #include <opencv2/calib3d/calib3d.hpp>
 

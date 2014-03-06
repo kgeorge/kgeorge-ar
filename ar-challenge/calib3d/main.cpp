@@ -11,7 +11,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
-#include "settings.hpp"
+#include "settings.h"
 #include "kgClient.h"
 #include "calib3d.h"
 

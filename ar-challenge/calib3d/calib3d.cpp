@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include "calib3d.h"
+#include "settings.h"
 
 using namespace cv;
 using namespace std;
@@ -274,6 +275,20 @@ static bool runCalibrationAndSave(
 }
 
 
+Calib3d::Calib3d(
+        Settings *ps,
+        std::vector< std::function<void(char)>> *pHandleToKeyboardFun):
+        ps(ps),
+        pHandleToKeyboardFun(pHandleToKeyboardFun) {
+        mode = ps->inputType == Settings::IMAGE_LIST ? CAPTURING : DETECTION;
+        boundKeyboardFunBody = std::bind(keyBoardFun, this, _1 );
+        pHandleToKeyboardFun->push_back(boundKeyboardFunBody);
+    }
+Calib3d::~Calib3d() {
+        delete ps;
+        pHandleToKeyboardFun->clear();
+    }
+
 void Calib3d::processFrame() {
     Mat view = ps->nextImage();
     if( mode == CAPTURING && imagePoints.size() >= (unsigned)ps->nrFrames )
@@ -338,4 +353,12 @@ void Calib3d::processFrame() {
     background.processFrame(view);
     background.draw();
     
+}
+
+void Calib3d::handleKey(char keyCode) {
+        if( ps->inputCapture.isOpened() && (keyCode == 'g' || keyCode == 'G') )
+        {
+            mode = CAPTURING;
+            imagePoints.clear();
+        }
 }
